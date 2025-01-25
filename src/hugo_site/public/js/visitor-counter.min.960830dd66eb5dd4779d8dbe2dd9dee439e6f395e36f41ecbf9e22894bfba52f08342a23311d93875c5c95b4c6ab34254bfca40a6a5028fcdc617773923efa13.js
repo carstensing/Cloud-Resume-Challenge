@@ -1,0 +1,1 @@
+let response_data="",apigClient=apigClientFactory.newClient(),params={},body={},additionalParams={};apigClient.visitorCounterGet(params,body,additionalParams).then(function(e){console.log(e.data),response_data=e.data.num_visitors,document.getElementById("output").innerHTML=`Visitor Counter: ${response_data}`}).catch(function(e){console.error(e)})

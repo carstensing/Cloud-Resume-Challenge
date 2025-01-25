@@ -1,0 +1,42 @@
+[
+    {
+        "ip-address": "11.22.33.44",
+        "browser": "WaterPanda",
+        "date": "2/28/20"
+    },
+    {
+        "ip-address": "11.22.33.44",
+        "browser": "FireWolf",
+        "date": "1/2/24"
+    },
+    {
+        "ip-address": "99.88.77.66",
+        "browser": "FireWolf",
+        "date": "1/2/24"
+    },
+    {
+        "ip-address": "1.2.3.4",
+        "browser": "WaterPanda",
+        "date": "1/2/24"
+    },
+    {
+        "ip-address": "4.3.2.1",
+        "browser": "SnowHippo",
+        "date": "1/2/24"
+    },
+    {
+        "ip-address": "5.6.7.8",
+        "browser": "WaterPanda",
+        "date": "1/2/24"
+    },
+    {
+        "ip-address": "8.7.6.5",
+        "browser": "SnowHippo",
+        "date": "1/2/24"
+    },
+    {
+        "ip-address": "8.7.6.5",
+        "browser": "FireWolf",
+        "date": "1/2/24"
+    }
+]

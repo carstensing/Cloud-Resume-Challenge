@@ -1,0 +1,27 @@
+[
+    {
+        "http_method": "GET",
+        "source_ip": "1.1.1.1",
+        "user-agent": "Chrome"
+    },
+    {
+        "http_method": "GET",
+        "source_ip": "1.1.1.1",
+        "user-agent": "FireFox"
+    },
+    {
+        "http_method": "GET",
+        "source_ip": "2.2.2.2",
+        "user-agent": "Chrome"
+    },
+    {
+        "http_method": "GET",
+        "source_ip": "2.2.2.2",
+        "user-agent": "FireFox"
+    },
+    {
+        "http_method": "GET",
+        "source_ip": "3.3.3.3",
+        "user-agent": "Chrome"
+    }
+]

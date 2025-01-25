@@ -1,0 +1,27 @@
+disabled = false
+languageCode = "en"
+languageName = "English"
+weight = 1
+title = "Carsten Singleton"
+
+[params]
+  displayName = "EN"
+  isoCode = "en"
+  rtl = false
+  dateFormat = "Jan 2, 2006"
+  logo = "img/logo.png"
+  # secondaryLogo = "img/secondary-logo.png"
+  description = "My awesome website"
+  # copyright = "Copy, _right?_ :thinking_face:"
+
+[params.author]
+  name = "Carsten Singleton"
+  # email = "youremail@example.com"
+  image = "img/profile.png"
+  imageQuality = 96
+  headline = "Software Engineer"
+  bio = "University grad excited to venture into the tech world."
+  links = [
+    { github = "https://github.com/carstensing" },
+    { linkedin = "https://linkedin.com/in/carstensing" },
+  ]
