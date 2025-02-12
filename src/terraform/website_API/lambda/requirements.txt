@@ -1,0 +1,20 @@
+# dev
+boto3
+
+# test
+pytest
+pytest-xdist
+moto
+pytest-watch
+
+# venv
+
+# To autorun tests:
+#    Add to the venv/bin/activate file:
+#      gnome-terminal -- bash -c "ptw --ext=.py,.json"
+#    If your terminal is different, change "gnome-terminal"
+
+# To give tests access to the src files:
+#   Create a file that ends with .pth to venv/lib/python3.13/site-packages.
+#   Add this (no spaces) to that file:
+#     ../../../../src

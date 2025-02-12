@@ -111,7 +111,7 @@ def test_get_num_visitors(data_tbl: DynamoDBClass):
     assert ret == random_val
 
 
-def test_increment_num_visitors(data_tbl: DynamoDBClass):
+def test_put_num_visitors(data_tbl: DynamoDBClass):
     random_val = random.randint(0, 100)
     data_tbl.table.put_item(
         Item={
@@ -120,9 +120,35 @@ def test_increment_num_visitors(data_tbl: DynamoDBClass):
         },
     )
     # print(data_tbl.table.scan(Select="ALL_ATTRIBUTES"))
-    ret = lam_func.increment_num_visitors(data_tbl)
+    ret = lam_func.update_num_visitors(data_tbl, "PUT", 0)
     # print(ret)
-    assert ret == (random_val + 1)
+    assert ret == 0
+
+
+def test_add_num_visitors(data_tbl: DynamoDBClass):
+    random_val = random.randint(1, 100)
+    data_tbl.table.put_item(
+        Item={
+            "p-key": "num-visitors",
+            "value": random_val,
+        },
+    )
+    # print(data_tbl.table.scan(Select="ALL_ATTRIBUTES"))
+    ret = lam_func.update_num_visitors(data_tbl, "ADD", random_val)
+    # print(ret)
+    assert ret == random_val * 2
+
+
+def test_add_num_visitors_uninitialized(data_tbl: DynamoDBClass):
+    random_val = random.randint(1, 100)
+    ret = lam_func.update_num_visitors(data_tbl, "ADD", random_val)
+    # print(ret)
+    # print(data_tbl.table.scan(Select="ALL_ATTRIBUTES"))
+    assert ret == random_val
+
+
+def test_get_num_visitors_uninitialized(data_tbl: DynamoDBClass):
+    assert lam_func.get_num_visitors(data_tbl) == 0
 
 
 def test_get_visitor_date(visitor_tbl: DynamoDBClass):

@@ -16,11 +16,11 @@ title = "Carsten Singleton"
 
 [params.author]
   name = "Carsten Singleton"
-  # email = "youremail@example.com"
+  # email = "replyTo@email.com"
   image = "img/profile.png"
   imageQuality = 96
   headline = "Software Engineer"
-  bio = "University grad excited to venture into the tech world."
+  bio = "Email: food-rural-pebble at duck dot com"
   links = [
     { github = "https://github.com/carstensing" },
     { linkedin = "https://linkedin.com/in/carstensing" },

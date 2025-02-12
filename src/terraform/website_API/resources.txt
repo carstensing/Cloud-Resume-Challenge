@@ -1,0 +1,18 @@
+{
+    "items": [
+        {
+            "id": "akijkm",
+            "parentId": "dfusadmna8",
+            "pathPart": "visitor-counter",
+            "path": "/visitor-counter",
+            "resourceMethods": {
+                "GET": {},
+                "OPTIONS": {}
+            }
+        },
+        {
+            "id": "dfusadmna8",
+            "path": "/"
+        }
+    ]
+}

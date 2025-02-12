@@ -27,23 +27,36 @@ _VISITOR_TBL = DynamoDBClass(environ.get("visitor_tbl", "None"))
 
 
 def get_num_visitors(data_tbl: DynamoDBClass) -> int:
-    num_visitors = data_tbl.table.get_item(
-        Key={"p-key": "num-visitors"},
-    )[
-        "Item"
-    ]["value"]
+    # Check if num-visitors is in table.
+    try:
+        num_visitors = data_tbl.table.get_item(
+            Key={
+                "p-key": "num-visitors",
+                #
+            },
+        )["Item"]["value"]
+    # Not in table.
+    except KeyError:
+        num_visitors = update_num_visitors(data_tbl, "PUT", 0)
+
     return num_visitors
 
 
-def increment_num_visitors(data_tbl: DynamoDBClass) -> int:
-    num_visitors_incremented = get_num_visitors(data_tbl) + 1
-    data_tbl.table.put_item(
-        Item={
+def update_num_visitors(data_tbl: DynamoDBClass, action: str, value: int) -> int:
+    num_visitors = data_tbl.table.update_item(
+        Key={
             "p-key": "num-visitors",
-            "value": num_visitors_incremented,
         },
-    )
-    return num_visitors_incremented
+        AttributeUpdates={
+            "value": {
+                "Value": value,
+                "Action": action,  # "ADD"|"PUT"|"DELETE"
+            }
+        },
+        ReturnValues="UPDATED_NEW",
+    )["Attributes"]["value"]
+    print(num_visitors)
+    return num_visitors
 
 
 def hash_user_info(info: str) -> str:
@@ -67,7 +80,7 @@ def get_visitor_date(ip: str, browser: str, visitor_tbl: DynamoDBClass) -> str |
             Key={
                 "ip-address": ip_hashed,
                 "browser": browser_hashed,
-            }
+            },
         )["Item"]["date"]
     # Not in table.
     except KeyError:
@@ -137,7 +150,7 @@ def lambda_handler(event: dict = {}, context: dict = {}) -> dict:
                     num_visitors = get_num_visitors(_DATA_TBL)
                 else:
                     put_visitor(ip, browser, _VISITOR_TBL)
-                    num_visitors = increment_num_visitors(_DATA_TBL)
+                    num_visitors = update_num_visitors(_DATA_TBL, "ADD", 1)
 
                 # print(visitor)
 

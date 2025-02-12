@@ -13,6 +13,8 @@ provider "aws" {
   profile = var.aws_profile
 }
 
+# Lambda ----------------------------------------------------------------------
+
 resource "aws_iam_role" "lambda_role" {
   name = "website_lambda_role"
 
@@ -35,13 +37,13 @@ resource "aws_iam_role" "lambda_role" {
 }
 
 resource "aws_iam_policy" "lambda_policy" {
-  name = "website_lambda_policy"
+  name = "site_lambda_policy"
 
   # Terraform's "jsonencode" function converts a
   # Terraform expression result to valid JSON syntax.
   policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
+    "Version" : "2012-10-17",
+    "Statement" : [
       {
         "Effect" : "Allow",
         "Action" : "logs:CreateLogGroup",
@@ -62,8 +64,12 @@ resource "aws_iam_policy" "lambda_policy" {
         "Action" : [
           "dynamodb:GetItem",
           "dynamodb:PutItem",
+          "dynamodb:UpdateItem",
         ],
-        "Resource" : "arn:aws:dynamodb:${var.aws_region}:${var.aws_account_id}:table/*"
+        "Resource" : [
+          "arn:aws:dynamodb:${var.aws_region}:${var.aws_account_id}:table/${aws_dynamodb_table.data_table.name}",
+          "arn:aws:dynamodb:${var.aws_region}:${var.aws_account_id}:table/${aws_dynamodb_table.visitor_table.name}"
+        ]
       }
     ]
   })
@@ -71,7 +77,7 @@ resource "aws_iam_policy" "lambda_policy" {
   tags = var.tags
 }
 
-resource "aws_iam_role_policy_attachment" "attach_policy_to_role" {
+resource "aws_iam_role_policy_attachment" "attach_policy_to_lambda_role" {
   role       = aws_iam_role.lambda_role.name
   policy_arn = aws_iam_policy.lambda_policy.arn
 }
@@ -87,7 +93,7 @@ data "archive_file" "zip_python_code" {
 }
 
 # Create a lambda function
-resource "aws_lambda_function" "terraform_lambda_func" {
+resource "aws_lambda_function" "site_lambda_func" {
   filename         = data.archive_file.zip_python_code.output_path
   source_code_hash = filebase64sha256(data.archive_file.zip_python_code.output_path)
   function_name    = "visitor-count"
@@ -96,15 +102,97 @@ resource "aws_lambda_function" "terraform_lambda_func" {
   runtime          = "python3.13"
 
   depends_on = [
-    aws_iam_role_policy_attachment.attach_policy_to_role,
+    aws_iam_role_policy_attachment.attach_policy_to_lambda_role,
   ]
 
   environment {
     variables = {
-      "data_tbl"    = "website-data",
-      "visitor_tbl" = "website-visitors"
+      "data_tbl"    = aws_dynamodb_table.data_table.name,
+      "visitor_tbl" = aws_dynamodb_table.visitor_table.name
     }
   }
 
   tags = var.tags
+}
+
+# DynamoDB --------------------------------------------------------------------
+
+resource "aws_dynamodb_table" "data_table" {
+  name         = "site-data"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "p-key"
+
+  attribute {
+    name = "p-key"
+    type = "S"
+  }
+
+  tags = var.tags
+}
+
+resource "aws_dynamodb_table" "visitor_table" {
+  name         = "site-visitors"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "ip-address"
+  range_key    = "browser"
+
+  attribute {
+    name = "ip-address"
+    type = "S"
+  }
+
+  attribute {
+    name = "browser"
+    type = "S"
+  }
+
+  tags = var.tags
+}
+
+# API Gateway -----------------------------------------------------------------
+
+resource "aws_api_gateway_rest_api" "site_API" {
+  name = "site-API"
+  endpoint_configuration {
+    types = ["REGIONAL"]
+  }
+
+  tags = var.tags
+}
+
+resource "aws_api_gateway_resource" "visitor_counter" {
+  parent_id   = aws_api_gateway_rest_api.site_API.root_resource_id
+  path_part   = "visitor-counter"
+  rest_api_id = aws_api_gateway_rest_api.site_API.id
+}
+
+resource "aws_api_gateway_method" "get" {
+  authorization = "NONE"
+  http_method   = "GET"
+  resource_id   = aws_api_gateway_resource.visitor_counter.id
+  rest_api_id   = aws_api_gateway_rest_api.site_API.id
+}
+
+resource "aws_api_gateway_integration" "integration" {
+  rest_api_id             = aws_api_gateway_rest_api.site_API.id
+  resource_id             = aws_api_gateway_resource.visitor_counter.id
+  http_method             = aws_api_gateway_method.get.http_method
+  integration_http_method = "POST"
+  type                    = "AWS"
+  uri                     = aws_lambda_function.site_lambda_func.invoke_arn
+  passthrough_behavior    = "WHEN_NO_MATCH"
+  content_handling        = "CONVERT_TO_TEXT"
+  timeout_milliseconds    = 29000
+
+  request_templates = {
+    "application/json" = jsonencode({
+      "domain_name" : "$context.domainName",
+      "http_method" : "$context.httpMethod",
+      "path" : "$context.path",
+      "resource_path" : "$context.resourcePath",
+      "resource_id" : "$context.resourceId",
+      "source_ip" : "$context.identity.sourceIp",
+      "user-agent" : "$context.identity.userAgent"
+    })
+  }
 }
