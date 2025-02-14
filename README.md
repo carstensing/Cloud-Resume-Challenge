@@ -424,13 +424,13 @@ services, I started with the AWS console.
 I broke everything down into the smallest steps I could and then pieced them
 together to slowly. I took these steps:
 
-1. Read and write to DynamoDB from Lambda
+1. Read and write to DynamoDB from Lambda TODO
 
-https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/programming-with-python.html
-
-2. TODO
+<https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/programming-with-python.html>
 
 ### 7. PyTests
+
+TODO
 
 <https://aws.amazon.com/blogs/devops/unit-testing-aws-lambda-with-python-and-mock-aws-services/>
 <https://docs.pytest.org/en/stable/example/parametrize.html#indirect-parametrization>
@@ -441,7 +441,42 @@ https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/programming-wit
 
 ### 8. Terraform
 
+Use the existing AWS infrastructure as a reference when writing Terraform for
+this project. Create identical resources with Terraform and then replace the
+original. Leverage AWS CLI commands to gather the required details for
+Terraform definitions. For example, the [get-method CLI
+command][cli_get_method] returns the data needed for defining the [API Gateway
+method in Terraform][api_gateway_method].
+
+- [Terraform AWS documentation][terraform_aws_doc]
+
+If you have zero Terraform experience like I did, Rahul Wagh has a fantastic
+video on [how to create a Lambda function is
+Terraform][deploy_lambda_with_terraform], which cleared up a lot of confusion.
+
+For Lambda, utilize the `source_code_hash` argument to trigger a rebuild
+whenever the Python code changes and remember to create an
+`aws_lambda_permission` resource for API Gateway when you get there.
+
+For API Gateway, remember to take care of the SDK generation. I use the
+`terraform_data` resource to run a bash shell script to update the JavaScript
+files.
+
+[api_gateway_method]:
+    https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/api_gateway_method
+
+[cli_get_method]:
+    https://awscli.amazonaws.com/v2/documentation/api/latest/reference/apigateway/get-method.html
+
+[terraform_aws_doc]:
+    https://registry.terraform.io/providers/hashicorp/aws/latest/docs
+
+[deploy_lambda_with_terraform]:
+    https://www.youtube.com/watch?v=JSR7U700h0U
+
 ### 9. Source Control
+
+Git and GitHub
 
 ## Technology Used
 

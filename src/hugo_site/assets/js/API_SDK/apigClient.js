@@ -53,7 +53,7 @@ apigClientFactory.newClient = function (config) {
 
     
     // extract endpoint and path from url
-    var invokeUrl = 'https://jtu0irkvf4.execute-api.us-west-1.amazonaws.com/test';
+    var invokeUrl = 'https://8icteuu9lf.execute-api.us-west-1.amazonaws.com/production';
     var endpoint = /(^https?:\/\/[^\/]+)/g.exec(invokeUrl)[1];
     var pathComponent = invokeUrl.substring(endpoint.length);
 
@@ -98,24 +98,6 @@ apigClientFactory.newClient = function (config) {
         
         
         return apiGatewayClient.makeRequest(visitorCounterGetRequest, authType, additionalParams, config.apiKey);
-    };
-    
-    
-    apigClient.visitorCounterPatch = function (params, body, additionalParams) {
-        if(additionalParams === undefined) { additionalParams = {}; }
-        
-        apiGateway.core.utils.assertParametersDefined(params, [], ['body']);
-        
-        var visitorCounterPatchRequest = {
-            verb: 'patch'.toUpperCase(),
-            path: pathComponent + uritemplate('/visitor-counter').expand(apiGateway.core.utils.parseParametersToObject(params, [])),
-            headers: apiGateway.core.utils.parseParametersToObject(params, []),
-            queryParams: apiGateway.core.utils.parseParametersToObject(params, []),
-            body: body
-        };
-        
-        
-        return apiGatewayClient.makeRequest(visitorCounterPatchRequest, authType, additionalParams, config.apiKey);
     };
     
     
