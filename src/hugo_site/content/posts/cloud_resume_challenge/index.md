@@ -50,38 +50,40 @@ hands-on experience with cloud technologies and serves as a portfolio piece for
 job seekers in the field. Any cloud service provider can be used to complete
 this challenge. I chose [Amazon Web Services][aws].
 
+Forrest also sells a [project guide][cloud_resume_challenge_book] that details
+the best ways to go about the challenge and includes additional modifications
+for even more hand-on practice. I found it to be incredibly helpful.
+
+General outline:
+
+- **Certification**: Obtain a cloud certification (AWS Certified Cloud
+  Practitioner).
+
+- **Frontend**: Create a static website (Hugo) and host it using a cloud
+  provider (S3, Route53 and CloudFront).
+
+- **Backend**: Implement a visitor counter using a serverless function,
+  database and a REST API (Lambda, DynamoDB and API Gateway).
+
+- **Infrastructure as Code (IaC)**: Automate deployments with Terraform.
+
+- **CI/CD**: Set up automated testing (pytest and PlayWright) and deployment
+  pipelines (GitHub Actions).
+
+<!-- reference links -->
+
 [forrest_brazeal]:
     https://forrestbrazeal.com/
 
 [aws]:
     https://aws.amazon.com/what-is-aws/
 
-This is the general outline:
-
-- **Certification**: Obtain a cloud certification (AWS Certified Cloud
-  Practitioner).
-
-- **Frontend**: Create a static website (HTML, CSS, JavaScript) and host it
-  using a cloud provider (S3, Route53, Cloudfront).
-
-- **Backend**: Implement a visitor counter using a serverless function and a
-  database (Lambda, DynamoDB, API Gateway).
-
-- **Infrastructure as Code (IaC)**: Automate deployments with tools like
-  Terraform or AWS CloudFormation.
-
-- **CI/CD**: Set up automated testing (PyTest, PlayWright) and deployment
-  pipelines (GitHub Actions).
-
-Forrest Brazeal has a project guide that details the best ways to go about the
-challenge and includes additional modifications for even more hand-on practice.
-I used
-
-<https://cloudresumechallenge.dev/book/>
+[cloud_resume_challenge_book]:
+    https://cloudresumechallenge.dev/book/
 
 ## Steps I Took
 
-### AWS Certification
+### 1. AWS Certification
 
 Without any prior cloud experience the project guide was difficult to
 understand. As I studied for the [AWS Certified Cloud
@@ -101,6 +103,8 @@ Free resources that I used to pass the exam (Oct 2024):
 - [Andrew Brown's lecture videos][lecture]
 - [Sthithapragna's practice questions][questions]
 
+<!-- reference links -->
+
 [certified_cloud_practitioner]:
     https://aws.amazon.com/certification/certified-cloud-practitioner/
 
@@ -109,10 +113,11 @@ Free resources that I used to pass the exam (Oct 2024):
 
 [lecture]:
     https://www.youtube.com/watch?v=NhDYbskXRgc&list=LL&index=11
+
 [questions]:
     https://www.youtube.com/playlist?list=PL7GozF-qZ4KeQftuqU3yxvQ-f3eFNUiuJ
 
-### Hugo Static Site
+### 2. Hugo Static Site
 
 I wanted to create a website that I could use for more than my resume.
 Something simple that worked with Markdown so I could reuse my repository
@@ -127,7 +132,7 @@ Free Resources to learn Hugo:
 - [Hugo documentation][hugo]
 - [Giraffe Academy][giraffe_academy]
 
-### AWS Organizations
+### 3. AWS Organizations
 
 AWS Organizations is a centralized account management service that helps
 businesses manage multiple AWS accounts efficiently. It provides security,
@@ -179,7 +184,7 @@ permissions attached to that role. This is an example of a service role that
 can be assumed by users to gain temporary access to resources they otherwise
 wouldn't have.
 
-As I moved from one service to another, I found what permissions I was lacking.
+As I moved from one service to another, I found which permissions were lacking.
 Following the principle of least privilege, I added only the permissions
 required for each specific task. This incremental approach helped me learn how
 services use IAM roles and policies, and how they impact development on AWS.
@@ -217,22 +222,24 @@ login is very convenient to use, even from the CLI.
 
 To avoid frequent logins, set the session duration to more than an hour.
 
+<!-- reference links -->
+
 [sso_for_personal_development]:
     https://dev.to/aws-builders/minimal-aws-sso-setup-for-personal-aws-development-220k
 
-### S3, HTTPS and DNS
+### 4. S3, Route53 and Cloudfront
 
 I purchased a domain name through Route 53 and created an S3 bucket to store my
-website files built by Hugo. Make sure the hosted zone's name servers match
-where traffic is being routed. I spent a lot of time trying to figure out why
-DNS wasn't working because of this. After that, I used CloudFront to enable
-HTTPS. AWS has tutorials on how to do all of this, which made it very easy.
+site files built by Hugo. After that, I used CloudFront to enable HTTPS and
+content delivery. AWS has guides on how to do all of this, which made it
+very easy.
 
 Learning Resources:
 
 - [Configuring a static site using a custom domain registered with Route 53][s3_static_site_custom_domain]
-
 - [CloudFront and HTTPS][s3_static_site_cloudfront_and_https]
+
+<!-- reference links -->
 
 [s3_static_site_custom_domain]:
     https://docs.aws.amazon.com/AmazonS3/latest/userguide/website-hosting-custom-domain-walkthrough.html
@@ -240,37 +247,256 @@ Learning Resources:
 [s3_static_site_cloudfront_and_https]:
     https://docs.aws.amazon.com/AmazonS3/latest/userguide/website-hosting-cloudfront-walkthrough.html
 
-### AWS CLI
+Some things weren't so obvious and required some investigation / trial and
+error. Here is what I learned:
 
-TODO
+#### Route 53 Name Server Issue
 
-### DynamoDB, Lambda, API Gateway and JavaScript
+For DNS to work properly, the record for routing traffic to your domain name
+must use the same name servers that the hosted zone uses. I recreated the
+hosted zone and record multiple times while following the guide and was
+auto-generated differing values, which made DNS not work.
+
+#### CloudFront Cache Update
+
+CloudFront caches S3 files for the static site, and any updates must be
+reflected in the cache. The expiration time for cached files be configured,
+with different lengths of time offering different pros and cons. Read their
+[cache expiration guide][cloudfront_cache_expiration] for more details.
+
+So, even after updating S3, your domain won't serve the updated files until they
+are cycled out. To avoid waiting for files to expire, they can be manually
+invalidated or automatically updated if versioned file names are used.
+
+<!-- reference links -->
+
+[cloudfront_cache_expiration]:
+    https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Expiration.html
+
+##### Invalidations
+
+Transferring new files to the cache incurs costs for both methods, and
+invalidations have an additional [cost after 1,000 submissions][invalidation_cost]. So, it's worth it to be smart about invalidation. Each deleted or modified file must be explicitly listed in the invalidation with its full bucket path.
+Getting these file paths takes some work but isn't too hard.
+
+<!-- reference links -->
+
+[invalidation_cost]:
+    https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/PayingForInvalidation.html
+
+##### Versioned File Names
+
+[AWS recommends versioned file names][invalidate_vs_versioned_files], but the
+implementation requires more work since the files names have to be managed.
+[This is a great post][cloudfront_hashed_file_names] about how to
+use hashed file names to update the cache.
+
+<!-- reference links -->
+
+[invalidate_vs_versioned_files]:
+    https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Invalidation.html#Invalidation_Expiration
+
+[cloudfront_hashed_file_names]:
+    https://stackoverflow.com/questions/72468436/how-best-to-serve-versioned-s3-files-from-cloudfront
+
+### 5. AWS CLI
+
+The AWS CLI tool is awesome because it does things that the online console
+can't. Certain tasks can be automated with scripts and other are just more
+efficient. It's also a fantastic learning tool for backwards engineering
+because the console often does more than one action at a time. I learned this
+after I redid part 4 only using the CLI.
+
+- [CLI install guide][cli_install_guide]
+- [CLI command completion][cli_command_completion]
+- [CLI command reference][cli_doc]
+
+[cli_install_guide]:
+    https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
+
+[cli_command_completion]:
+    https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-completion.html
+
+[cli_doc]:
+    https://awscli.amazonaws.com/v2/documentation/api/latest/reference/index.html
+
+#### SSO for CLI
+
+Some configuration is required to use SSO with the AWS CLI. I prefer editing the
+`~/.aws/config` file directly instead of using their setup wizard. Follow the user guide:
+
+- [SSO config for CLI][sso_config_for_cli]
+
+To login:
+
+```bash
+aws sso login --profile my-profile
+```
+
+Automatically loading a profile requires exporting it to your shell startup
+script:
+
+```bash
+echo "export AWS_PROFILE=my-profile" >> ~/.bashrc
+source ~/.bashrc
+```
+
+For safety, it's better to leave `AWS_PROFILE` unset when using multiple
+profiles, to ensure actions are performed with the correct profile.
+
+<!-- reference links -->
+
+[sso_config_for_cli]:
+    https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-sso.html#cli-configure-sso-manual
+
+#### Manual Site Update
+
+These steps updated the bucket files and refresh the CloudFront cache. This
+isn't the greatest manual solution but it is close enough. All of these steps will be automated later in the project.
+
+1. Delete and rebuild `src/hugo_site/public/` to refresh Hugo.
+
+    `rm -fr src/hugo_site/public`
+
+    `cd src/hugo_site`
+
+    `hugo`
+
+2. Sign in to AWS SSO.
+
+3. Download the bucket.
+
+    `aws s3 sync s3://carsten-singleton.com old_bucket_files`
+
+4. Add new / updated files from `public/` to the bucket.
+
+    `aws s3 sync src/hugo_site/public s3://carsten-singleton.com`
+
+5. Get the list of files that were deleted in this update.
+
+    `rsync -rvni --ignore-existing old_bucket_files/ src/hugo_site/public/ > files-to-delete.txt`
+
+6. Get rid of the prepended text you don't need in VSCode.
+
+7. Delete files from the bucket that aren't in `public/`.
+
+    `cat files-to-delete.txt | xargs -I {} aws s3 rm "s3://carsten-singleton.com/{}"`
+
+8. Get files to invalidate in CloudFront.
+
+    `rsync -rcni old_bucket_files/ src/hugo_site/public/ > files-to-invalidate.txt`
+
+9. Get rid of the prepended text you don't need in VSCode.
+
+10. Invalidate the files in the AWS console.
+
+### 6. DynamoDB, Lambda, API Gateway and JavaScript
 
 I learned a **ton** on this chuck of the project. I understood the concept of
 how a website, a database and an API interacted, but actually building it all
-really challenged me.
+really challenged me. Again, since I didn't have any experience with these
+services, I started with the AWS console.
+
+I broke everything down into the smallest steps I could and then pieced them
+together to slowly. I took these steps:
+
+1. Read and write to DynamoDB from Lambda TODO
+
+<https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/programming-with-python.html>
+
+### 7. pytests
+
+When migrating to local development, I wanted to replicate the integrated test
+function available in the Lambda online console. Using pytest enabled me to
+practice test-driven development, automate testing, and accelerate the
+development process.
+
+I configured my Python virtual environment to run pytest-watch on startup,
+which automatically runs tests when the source files are saved. Using
+pytest-xdist makes it possible to run tests in parallel, speeding up test
+times. Configuration of pytest.ini is needed to use pytest-xdist automatically
+when pytest-watch runs the tests.
+
+To autorun tests:
+    Add to the venv/bin/activate file:
+      gnome-terminal -- bash -c "ptw --ext=.py,.json"
+    If your terminal is different, change "gnome-terminal"
+
+To give tests access to the src files:
+   Create a file that ends with .pth to venv/lib/python3.13/site-packages.
+   Add this (no spaces) to that file:
+     ../../../../src
+
+```
+# pytest.ini
+
+[pytest]
+addopts = -n auto --disable-warnings
+```
 
 TODO
 
-### Tests
+<https://aws.amazon.com/blogs/devops/unit-testing-aws-lambda-with-python-and-mock-aws-services/>
+<https://docs.pytest.org/en/stable/example/parametrize.html#indirect-parametrization>
 
-TODO
+<https://docs.pytest.org/en/stable/how-to/parametrize.html#parametrize>
 
-### Terraform
+<https://docs.pytest.org/en/stable/how-to/fixtures.html#>
 
-TODO
+### 8. Terraform
 
-### Source Control
+Use the existing AWS infrastructure as a reference when writing Terraform for
+this project. Create identical resources with Terraform and then replace the
+original. Leverage AWS CLI commands to gather the required details for
+Terraform definitions. For example, the [get-method CLI
+command][cli_get_method] returns the data needed for defining the [API Gateway
+method in Terraform][api_gateway_method].
 
-TODO
+- [Terraform AWS documentation][terraform_aws_doc]
 
-## Technology learned
+If you have zero Terraform experience like I did, Rahul Wagh has a fantastic
+video on [how to create a Lambda function is
+Terraform][deploy_lambda_with_terraform], which cleared up a lot of confusion.
+
+For Lambda, utilize the `source_code_hash` argument to trigger a rebuild
+whenever the Python code changes and remember to create an
+`aws_lambda_permission` resource for API Gateway when you get there.
+
+For API Gateway, remember to take care of the SDK generation. I use the
+`terraform_data` resource to run a bash shell script to update the JavaScript
+files.
+
+[api_gateway_method]:
+    https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/api_gateway_method
+
+[cli_get_method]:
+    https://awscli.amazonaws.com/v2/documentation/api/latest/reference/apigateway/get-method.html
+
+[terraform_aws_doc]:
+    https://registry.terraform.io/providers/hashicorp/aws/latest/docs
+
+[deploy_lambda_with_terraform]:
+    https://www.youtube.com/watch?v=JSR7U700h0U
+
+### 9. Source Control
+
+Git and GitHub
+
+## Technology Used
 
 - [AWS CLI][aws_cli]
 - [Hugo][hugo]
-- [PyTest][pytest]
+- [pytest][pytest]
 - [PlayWright for Python][playwright_for_python]
 - [Terraform][terraform]
+
+- Git
+- Github
+- VSCode
+- Ubuntu
+- Firefox Developer Tools
+
+<!-- reference links -->
 
 [aws_cli]:
     https://awscli.amazonaws.com/v2/documentation/api/latest/reference/index.html
@@ -292,11 +518,3 @@ TODO
 
 [terraform]:
     https://developer.hashicorp.com/terraform?product_intent=terraform
-
-## Technology Used
-
-- Git
-- Github
-- VSCode
-- Ubuntu
-- Firefox Developer Tools

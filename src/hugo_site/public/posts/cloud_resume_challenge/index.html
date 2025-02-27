@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr" class="scroll-smooth" data-default-appearance="dark"
-  data-auto-appearance="true"><head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+  data-auto-appearance="true"><head>
     <meta charset="utf-8" />
     
     <meta http-equiv="content-language" content="en" />
@@ -15,7 +15,7 @@
     
     
     
-    <link rel="canonical" href="http://localhost:1313/posts/cloud_resume_challenge/" />
+    <link rel="canonical" href="https://carsten-singleton.com/posts/cloud_resume_challenge/" />
     
     
     
@@ -91,7 +91,7 @@
 
     
     
-    <script defer type="text/javascript" src="/js/SDK.min.1fed2285f9209de393bd1a04e1f02a0c3607bf7206b9796f0be9ee8ce4ebb391a09a7ac9f459f0c5afc57b8375cfa5f7a22f479307ff87960683317f19e990fd.js"></script>
+    <script defer type="text/javascript" src="/js/SDK.min.2bf57b71d9dd1da5c5c4b4ef799d11cf1f4ea70645c6a50cd74d71f8fc93494cf96914de155c9fd06c06d8da51ef4498b0627acfcc444497776c130b55465c38.js"></script>
     
 
     
@@ -123,13 +123,13 @@
     <meta property="og:title" content="Cloud Resume Challenge [Draft]" />
 <meta property="og:description" content="A work in progress." />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="http://localhost:1313/posts/cloud_resume_challenge/" /><meta property="og:image" content="http://localhost:1313/posts/cloud_resume_challenge/featured.jpg" /><meta property="article:section" content="posts" />
+<meta property="og:url" content="https://carsten-singleton.com/posts/cloud_resume_challenge/" /><meta property="og:image" content="https://carsten-singleton.com/posts/cloud_resume_challenge/featured.jpg" /><meta property="article:section" content="posts" />
 <meta property="article:published_time" content="2024-10-17T14:55:59-07:00" />
 <meta property="article:modified_time" content="2024-10-17T14:55:59-07:00" />
 
 
     <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:image" content="http://localhost:1313/posts/cloud_resume_challenge/featured.jpg" /><meta name="twitter:title" content="Cloud Resume Challenge [Draft]"/>
+<meta name="twitter:image" content="https://carsten-singleton.com/posts/cloud_resume_challenge/featured.jpg" /><meta name="twitter:title" content="Cloud Resume Challenge [Draft]"/>
 <meta name="twitter:description" content="A work in progress."/>
 
     
@@ -143,7 +143,7 @@
     
     "abstract": "A work in progress.",
     "inLanguage": "en",
-    "url" : "http:\/\/localhost:1313\/posts\/cloud_resume_challenge\/",
+    "url" : "https:\/\/carsten-singleton.com\/posts\/cloud_resume_challenge\/",
     "author" : {
       "@type": "Person",
       "name": "Carsten Singleton"
@@ -157,7 +157,7 @@
     
     
     "mainEntityOfPage": "true",
-    "wordCount": "1389"
+    "wordCount": "2260"
   }]
   </script>
 
@@ -779,9 +779,9 @@
     </li>
     <li><a href="#steps-i-took">Steps I Took</a>
       <ul>
-        <li><a href="#aws-certification">AWS Certification</a></li>
-        <li><a href="#hugo-static-site">Hugo Static Site</a></li>
-        <li><a href="#aws-organizations">AWS Organizations</a>
+        <li><a href="#1-aws-certification">1. AWS Certification</a></li>
+        <li><a href="#2-hugo-static-site">2. Hugo Static Site</a></li>
+        <li><a href="#3-aws-organizations">3. AWS Organizations</a>
           <ul>
             <li><a href="#account-protection">Account Protection</a></li>
             <li><a href="#iam-roles-and-policies">IAM Roles and Policies</a></li>
@@ -789,15 +789,24 @@
             <li><a href="#sso-login">SSO Login</a></li>
           </ul>
         </li>
-        <li><a href="#s3-https-and-dns">S3, HTTPS and DNS</a></li>
-        <li><a href="#aws-cli">AWS CLI</a></li>
-        <li><a href="#dynamodb-lambda-api-gateway-and-javascript">DynamoDB, Lambda, API Gateway and JavaScript</a></li>
-        <li><a href="#tests">Tests</a></li>
-        <li><a href="#terraform">Terraform</a></li>
-        <li><a href="#source-control">Source Control</a></li>
+        <li><a href="#4-s3-route53-and-cloudfront">4. S3, Route53 and Cloudfront</a>
+          <ul>
+            <li><a href="#route-53-name-server-issue">Route 53 Name Server Issue</a></li>
+            <li><a href="#cloudfront-cache-update">CloudFront Cache Update</a></li>
+          </ul>
+        </li>
+        <li><a href="#5-aws-cli">5. AWS CLI</a>
+          <ul>
+            <li><a href="#sso-for-cli">SSO for CLI</a></li>
+            <li><a href="#manual-site-update">Manual Site Update</a></li>
+          </ul>
+        </li>
+        <li><a href="#6-dynamodb-lambda-api-gateway-and-javascript">6. DynamoDB, Lambda, API Gateway and JavaScript</a></li>
+        <li><a href="#7-pytests">7. pytests</a></li>
+        <li><a href="#8-terraform">8. Terraform</a></li>
+        <li><a href="#9-source-control">9. Source Control</a></li>
       </ul>
     </li>
-    <li><a href="#technology-learned">Technology learned</a></li>
     <li><a href="#technology-used">Technology Used</a></li>
   </ul>
 </nav>
@@ -820,9 +829,9 @@
     </li>
     <li><a href="#steps-i-took">Steps I Took</a>
       <ul>
-        <li><a href="#aws-certification">AWS Certification</a></li>
-        <li><a href="#hugo-static-site">Hugo Static Site</a></li>
-        <li><a href="#aws-organizations">AWS Organizations</a>
+        <li><a href="#1-aws-certification">1. AWS Certification</a></li>
+        <li><a href="#2-hugo-static-site">2. Hugo Static Site</a></li>
+        <li><a href="#3-aws-organizations">3. AWS Organizations</a>
           <ul>
             <li><a href="#account-protection">Account Protection</a></li>
             <li><a href="#iam-roles-and-policies">IAM Roles and Policies</a></li>
@@ -830,15 +839,24 @@
             <li><a href="#sso-login">SSO Login</a></li>
           </ul>
         </li>
-        <li><a href="#s3-https-and-dns">S3, HTTPS and DNS</a></li>
-        <li><a href="#aws-cli">AWS CLI</a></li>
-        <li><a href="#dynamodb-lambda-api-gateway-and-javascript">DynamoDB, Lambda, API Gateway and JavaScript</a></li>
-        <li><a href="#tests">Tests</a></li>
-        <li><a href="#terraform">Terraform</a></li>
-        <li><a href="#source-control">Source Control</a></li>
+        <li><a href="#4-s3-route53-and-cloudfront">4. S3, Route53 and Cloudfront</a>
+          <ul>
+            <li><a href="#route-53-name-server-issue">Route 53 Name Server Issue</a></li>
+            <li><a href="#cloudfront-cache-update">CloudFront Cache Update</a></li>
+          </ul>
+        </li>
+        <li><a href="#5-aws-cli">5. AWS CLI</a>
+          <ul>
+            <li><a href="#sso-for-cli">SSO for CLI</a></li>
+            <li><a href="#manual-site-update">Manual Site Update</a></li>
+          </ul>
+        </li>
+        <li><a href="#6-dynamodb-lambda-api-gateway-and-javascript">6. DynamoDB, Lambda, API Gateway and JavaScript</a></li>
+        <li><a href="#7-pytests">7. pytests</a></li>
+        <li><a href="#8-terraform">8. Terraform</a></li>
+        <li><a href="#9-source-control">9. Source Control</a></li>
       </ul>
     </li>
-    <li><a href="#technology-learned">Technology learned</a></li>
     <li><a href="#technology-used">Technology Used</a></li>
   </ul>
 </nav>
@@ -990,33 +1008,32 @@ development—culminating in a personal resume website. The challenge provides
 hands-on experience with cloud technologies and serves as a portfolio piece for
 job seekers in the field. Any cloud service provider can be used to complete
 this challenge. I chose <a href="https://aws.amazon.com/what-is-aws/" target="_blank">Amazon Web Services</a>.</p>
-<p>This is the general outline:</p>
+<p>Forrest also sells a <a href="https://cloudresumechallenge.dev/book/" target="_blank">project guide</a> that details
+the best ways to go about the challenge and includes additional modifications
+for even more hand-on practice. I found it to be incredibly helpful.</p>
+<p>General outline:</p>
 <ul>
 <li>
 <p><strong>Certification</strong>: Obtain a cloud certification (AWS Certified Cloud
 Practitioner).</p>
 </li>
 <li>
-<p><strong>Frontend</strong>: Create a static website (HTML, CSS, JavaScript) and host it
-using a cloud provider (S3, Route53, Cloudfront).</p>
+<p><strong>Frontend</strong>: Create a static website (Hugo) and host it using a cloud
+provider (S3, Route53 and CloudFront).</p>
 </li>
 <li>
-<p><strong>Backend</strong>: Implement a visitor counter using a serverless function and a
-database (Lambda, DynamoDB, API Gateway).</p>
+<p><strong>Backend</strong>: Implement a visitor counter using a serverless function,
+database and a REST API (Lambda, DynamoDB and API Gateway).</p>
 </li>
 <li>
-<p><strong>Infrastructure as Code (IaC)</strong>: Automate deployments with tools like
-Terraform or AWS CloudFormation.</p>
+<p><strong>Infrastructure as Code (IaC)</strong>: Automate deployments with Terraform.</p>
 </li>
 <li>
-<p><strong>CI/CD</strong>: Set up automated testing (PyTest, PlayWright) and deployment
+<p><strong>CI/CD</strong>: Set up automated testing (pytest and PlayWright) and deployment
 pipelines (GitHub Actions).</p>
 </li>
 </ul>
-<p>Forrest Brazeal has a project guide that details the best ways to go about the
-challenge and includes additional modifications for even more hand-on practice.
-I used</p>
-<p><a href="https://cloudresumechallenge.dev/book/" target="_blank">https://cloudresumechallenge.dev/book/</a></p>
+<!-- reference links -->
 
 
 <h2 class="relative group">Steps I Took 
@@ -1031,13 +1048,13 @@ I used</p>
 </h2>
 
 
-<h3 class="relative group">AWS Certification 
-    <div id="aws-certification" class="anchor"></div>
+<h3 class="relative group">1. AWS Certification 
+    <div id="1-aws-certification" class="anchor"></div>
     
     <span
         class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
         <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
-            style="text-decoration-line: none !important;" href="#aws-certification" aria-label="Anchor">#</a>
+            style="text-decoration-line: none !important;" href="#1-aws-certification" aria-label="Anchor">#</a>
     </span>        
     
 </h3>
@@ -1056,15 +1073,16 @@ Solutions Architect</a> certification as well.</p>
 <li><a href="https://www.youtube.com/watch?v=NhDYbskXRgc&amp;list=LL&amp;index=11" target="_blank">Andrew Brown&rsquo;s lecture videos</a></li>
 <li><a href="https://www.youtube.com/playlist?list=PL7GozF-qZ4KeQftuqU3yxvQ-f3eFNUiuJ" target="_blank">Sthithapragna&rsquo;s practice questions</a></li>
 </ul>
+<!-- reference links -->
 
 
-<h3 class="relative group">Hugo Static Site 
-    <div id="hugo-static-site" class="anchor"></div>
+<h3 class="relative group">2. Hugo Static Site 
+    <div id="2-hugo-static-site" class="anchor"></div>
     
     <span
         class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
         <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
-            style="text-decoration-line: none !important;" href="#hugo-static-site" aria-label="Anchor">#</a>
+            style="text-decoration-line: none !important;" href="#2-hugo-static-site" aria-label="Anchor">#</a>
     </span>        
     
 </h3>
@@ -1082,13 +1100,13 @@ HTML and CSS static site that I would dread updating.</p>
 </ul>
 
 
-<h3 class="relative group">AWS Organizations 
-    <div id="aws-organizations" class="anchor"></div>
+<h3 class="relative group">3. AWS Organizations 
+    <div id="3-aws-organizations" class="anchor"></div>
     
     <span
         class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
         <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
-            style="text-decoration-line: none !important;" href="#aws-organizations" aria-label="Anchor">#</a>
+            style="text-decoration-line: none !important;" href="#3-aws-organizations" aria-label="Anchor">#</a>
     </span>        
     
 </h3>
@@ -1151,7 +1169,7 @@ the role associated with the vehicle and is granted access based on the
 permissions attached to that role. This is an example of a service role that
 can be assumed by users to gain temporary access to resources they otherwise
 wouldn&rsquo;t have.</p>
-<p>As I moved from one service to another, I found what permissions I was lacking.
+<p>As I moved from one service to another, I found which permissions were lacking.
 Following the principle of least privilege, I added only the permissions
 required for each specific task. This incremental approach helped me learn how
 services use IAM roles and policies, and how they impact development on AWS.</p>
@@ -1203,119 +1221,305 @@ login is very convenient to use, even from the CLI.</p>
 <li><a href="https://dev.to/aws-builders/minimal-aws-sso-setup-for-personal-aws-development-220k" target="_blank">SSO setup guide for personal development</a></li>
 </ul>
 <p>To avoid frequent logins, set the session duration to more than an hour.</p>
+<!-- reference links -->
 
 
-<h3 class="relative group">S3, HTTPS and DNS 
-    <div id="s3-https-and-dns" class="anchor"></div>
+<h3 class="relative group">4. S3, Route53 and Cloudfront 
+    <div id="4-s3-route53-and-cloudfront" class="anchor"></div>
     
     <span
         class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
         <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
-            style="text-decoration-line: none !important;" href="#s3-https-and-dns" aria-label="Anchor">#</a>
+            style="text-decoration-line: none !important;" href="#4-s3-route53-and-cloudfront" aria-label="Anchor">#</a>
     </span>        
     
 </h3>
 <p>I purchased a domain name through Route 53 and created an S3 bucket to store my
-website files built by Hugo. Make sure the hosted zone&rsquo;s name servers match
-where traffic is being routed. I spent a lot of time trying to figure out why
-DNS wasn&rsquo;t working because of this. After that, I used CloudFront to enable
-HTTPS. AWS has tutorials on how to do all of this, which made it very easy.</p>
+site files built by Hugo. After that, I used CloudFront to enable HTTPS and
+content delivery. AWS has guides on how to do all of this, which made it
+very easy.</p>
 <p>Learning Resources:</p>
 <ul>
-<li>
-<p><a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/website-hosting-custom-domain-walkthrough.html" target="_blank">Configuring a static site using a custom domain registered with Route 53</a></p>
-</li>
-<li>
-<p><a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/website-hosting-cloudfront-walkthrough.html" target="_blank">CloudFront and HTTPS</a></p>
-</li>
+<li><a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/website-hosting-custom-domain-walkthrough.html" target="_blank">Configuring a static site using a custom domain registered with Route 53</a></li>
+<li><a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/website-hosting-cloudfront-walkthrough.html" target="_blank">CloudFront and HTTPS</a></li>
 </ul>
+<!-- reference links -->
+<p>Some things weren&rsquo;t so obvious and required some investigation / trial and
+error. Here is what I learned:</p>
 
 
-<h3 class="relative group">AWS CLI 
-    <div id="aws-cli" class="anchor"></div>
+<h4 class="relative group">Route 53 Name Server Issue 
+    <div id="route-53-name-server-issue" class="anchor"></div>
     
     <span
         class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
         <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
-            style="text-decoration-line: none !important;" href="#aws-cli" aria-label="Anchor">#</a>
+            style="text-decoration-line: none !important;" href="#route-53-name-server-issue" aria-label="Anchor">#</a>
+    </span>        
+    
+</h4>
+<p>For DNS to work properly, the record for routing traffic to your domain name
+must use the same name servers that the hosted zone uses. I recreated the
+hosted zone and record multiple times while following the guide and was
+auto-generated differing values, which made DNS not work.</p>
+
+
+<h4 class="relative group">CloudFront Cache Update 
+    <div id="cloudfront-cache-update" class="anchor"></div>
+    
+    <span
+        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
+        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
+            style="text-decoration-line: none !important;" href="#cloudfront-cache-update" aria-label="Anchor">#</a>
+    </span>        
+    
+</h4>
+<p>CloudFront caches S3 files for the static site, and any updates must be
+reflected in the cache. The expiration time for cached files be configured,
+with different lengths of time offering different pros and cons. Read their
+<a href="https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Expiration.html" target="_blank">cache expiration guide</a> for more details.</p>
+<p>So, even after updating S3, your domain won&rsquo;t serve the updated files until they
+are cycled out. To avoid waiting for files to expire, they can be manually
+invalidated or automatically updated if versioned file names are used.</p>
+<!-- reference links -->
+
+
+<h5 class="relative group">Invalidations 
+    <div id="invalidations" class="anchor"></div>
+    
+    <span
+        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
+        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
+            style="text-decoration-line: none !important;" href="#invalidations" aria-label="Anchor">#</a>
+    </span>        
+    
+</h5>
+<p>Transferring new files to the cache incurs costs for both methods, and
+invalidations have an additional <a href="https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/PayingForInvalidation.html" target="_blank">cost after 1,000 submissions</a>. So, it&rsquo;s worth it to be smart about invalidation. Each deleted or modified file must be explicitly listed in the invalidation with its full bucket path.
+Getting these file paths takes some work but isn&rsquo;t too hard.</p>
+<!-- reference links -->
+
+
+<h5 class="relative group">Versioned File Names 
+    <div id="versioned-file-names" class="anchor"></div>
+    
+    <span
+        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
+        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
+            style="text-decoration-line: none !important;" href="#versioned-file-names" aria-label="Anchor">#</a>
+    </span>        
+    
+</h5>
+<p><a href="https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Invalidation.html#Invalidation_Expiration" target="_blank">AWS recommends versioned file names</a>, but the
+implementation requires more work since the files names have to be managed.
+<a href="https://stackoverflow.com/questions/72468436/how-best-to-serve-versioned-s3-files-from-cloudfront" target="_blank">This is a great post</a> about how to
+use hashed file names to update the cache.</p>
+<!-- reference links -->
+
+
+<h3 class="relative group">5. AWS CLI 
+    <div id="5-aws-cli" class="anchor"></div>
+    
+    <span
+        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
+        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
+            style="text-decoration-line: none !important;" href="#5-aws-cli" aria-label="Anchor">#</a>
     </span>        
     
 </h3>
-<p>TODO</p>
+<p>The AWS CLI tool is awesome because it does things that the online console
+can&rsquo;t. Certain tasks can be automated with scripts and other are just more
+efficient. It&rsquo;s also a fantastic learning tool for backwards engineering
+because the console often does more than one action at a time. I learned this
+after I redid part 4 only using the CLI.</p>
+<ul>
+<li><a href="https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html" target="_blank">CLI install guide</a></li>
+<li><a href="https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-completion.html" target="_blank">CLI command completion</a></li>
+<li><a href="https://awscli.amazonaws.com/v2/documentation/api/latest/reference/index.html" target="_blank">CLI command reference</a></li>
+</ul>
 
 
-<h3 class="relative group">DynamoDB, Lambda, API Gateway and JavaScript 
-    <div id="dynamodb-lambda-api-gateway-and-javascript" class="anchor"></div>
+<h4 class="relative group">SSO for CLI 
+    <div id="sso-for-cli" class="anchor"></div>
     
     <span
         class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
         <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
-            style="text-decoration-line: none !important;" href="#dynamodb-lambda-api-gateway-and-javascript" aria-label="Anchor">#</a>
+            style="text-decoration-line: none !important;" href="#sso-for-cli" aria-label="Anchor">#</a>
+    </span>        
+    
+</h4>
+<p>Some configuration is required to use SSO with the AWS CLI. I prefer editing the
+<code>~/.aws/config</code> file directly instead of using their setup wizard. Follow the user guide:</p>
+<ul>
+<li><a href="https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-sso.html#cli-configure-sso-manual" target="_blank">SSO config for CLI</a></li>
+</ul>
+<p>To login:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">aws sso login --profile my-profile
+</span></span></code></pre></div><p>Automatically loading a profile requires exporting it to your shell startup
+script:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="nb">echo</span> <span class="s2">&#34;export AWS_PROFILE=my-profile&#34;</span> &gt;&gt; ~/.bashrc
+</span></span><span class="line"><span class="cl"><span class="nb">source</span> ~/.bashrc
+</span></span></code></pre></div><p>For safety, it&rsquo;s better to leave <code>AWS_PROFILE</code> unset when using multiple
+profiles, to ensure actions are performed with the correct profile.</p>
+<!-- reference links -->
+
+
+<h4 class="relative group">Manual Site Update 
+    <div id="manual-site-update" class="anchor"></div>
+    
+    <span
+        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
+        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
+            style="text-decoration-line: none !important;" href="#manual-site-update" aria-label="Anchor">#</a>
+    </span>        
+    
+</h4>
+<p>These steps updated the bucket files and refresh the CloudFront cache. This
+isn&rsquo;t the greatest manual solution but it is close enough. All of these steps will be automated later in the project.</p>
+<ol>
+<li>
+<p>Delete and rebuild <code>src/hugo_site/public/</code> to refresh Hugo.</p>
+<p><code>rm -fr src/hugo_site/public</code></p>
+<p><code>cd src/hugo_site</code></p>
+<p><code>hugo</code></p>
+</li>
+<li>
+<p>Sign in to AWS SSO.</p>
+</li>
+<li>
+<p>Download the bucket.</p>
+<p><code>aws s3 sync s3://carsten-singleton.com old_bucket_files</code></p>
+</li>
+<li>
+<p>Add new / updated files from <code>public/</code> to the bucket.</p>
+<p><code>aws s3 sync src/hugo_site/public s3://carsten-singleton.com</code></p>
+</li>
+<li>
+<p>Get the list of files that were deleted in this update.</p>
+<p><code>rsync -rvni --ignore-existing old_bucket_files/ src/hugo_site/public/ &gt; files-to-delete.txt</code></p>
+</li>
+<li>
+<p>Get rid of the prepended text you don&rsquo;t need in VSCode.</p>
+</li>
+<li>
+<p>Delete files from the bucket that aren&rsquo;t in <code>public/</code>.</p>
+<p><code>cat files-to-delete.txt | xargs -I {} aws s3 rm &quot;s3://carsten-singleton.com/{}&quot;</code></p>
+</li>
+<li>
+<p>Get files to invalidate in CloudFront.</p>
+<p><code>rsync -rcni old_bucket_files/ src/hugo_site/public/ &gt; files-to-invalidate.txt</code></p>
+</li>
+<li>
+<p>Get rid of the prepended text you don&rsquo;t need in VSCode.</p>
+</li>
+<li>
+<p>Invalidate the files in the AWS console.</p>
+</li>
+</ol>
+
+
+<h3 class="relative group">6. DynamoDB, Lambda, API Gateway and JavaScript 
+    <div id="6-dynamodb-lambda-api-gateway-and-javascript" class="anchor"></div>
+    
+    <span
+        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
+        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
+            style="text-decoration-line: none !important;" href="#6-dynamodb-lambda-api-gateway-and-javascript" aria-label="Anchor">#</a>
     </span>        
     
 </h3>
 <p>I learned a <strong>ton</strong> on this chuck of the project. I understood the concept of
 how a website, a database and an API interacted, but actually building it all
-really challenged me.</p>
-<p>TODO</p>
+really challenged me. Again, since I didn&rsquo;t have any experience with these
+services, I started with the AWS console.</p>
+<p>I broke everything down into the smallest steps I could and then pieced them
+together to slowly. I took these steps:</p>
+<ol>
+<li>Read and write to DynamoDB from Lambda TODO</li>
+</ol>
+<p><a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/programming-with-python.html" target="_blank">https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/programming-with-python.html</a></p>
 
 
-<h3 class="relative group">Tests 
-    <div id="tests" class="anchor"></div>
+<h3 class="relative group">7. pytests 
+    <div id="7-pytests" class="anchor"></div>
     
     <span
         class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
         <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
-            style="text-decoration-line: none !important;" href="#tests" aria-label="Anchor">#</a>
+            style="text-decoration-line: none !important;" href="#7-pytests" aria-label="Anchor">#</a>
     </span>        
     
 </h3>
-<p>TODO</p>
+<p>When migrating to local development, I wanted to replicate the integrated test
+function available in the Lambda online console. Using pytest enabled me to
+practice test-driven development, automate testing, and accelerate the
+development process.</p>
+<p>I configured my Python virtual environment to run pytest-watch on startup,
+which automatically runs tests when the source files are saved. Using
+pytest-xdist makes it possible to run tests in parallel, speeding up test
+times. Configuration of pytest.ini is needed to use pytest-xdist automatically
+when pytest-watch runs the tests.</p>
+<p>To autorun tests:
+Add to the venv/bin/activate file:
+gnome-terminal &ndash; bash -c &ldquo;ptw &ndash;ext=.py,.json&rdquo;
+If your terminal is different, change &ldquo;gnome-terminal&rdquo;</p>
+<p>To give tests access to the src files:
+Create a file that ends with .pth to venv/lib/python3.13/site-packages.
+Add this (no spaces) to that file:
+../../../../src</p>
+<pre tabindex="0"><code># pytest.ini
+
+[pytest]
+addopts = -n auto --disable-warnings
+</code></pre><p>TODO</p>
+<p><a href="https://aws.amazon.com/blogs/devops/unit-testing-aws-lambda-with-python-and-mock-aws-services/" target="_blank">https://aws.amazon.com/blogs/devops/unit-testing-aws-lambda-with-python-and-mock-aws-services/</a>
+<a href="https://docs.pytest.org/en/stable/example/parametrize.html#indirect-parametrization" target="_blank">https://docs.pytest.org/en/stable/example/parametrize.html#indirect-parametrization</a></p>
+<p><a href="https://docs.pytest.org/en/stable/how-to/parametrize.html#parametrize" target="_blank">https://docs.pytest.org/en/stable/how-to/parametrize.html#parametrize</a></p>
+<p><a href="https://docs.pytest.org/en/stable/how-to/fixtures.html#" target="_blank">https://docs.pytest.org/en/stable/how-to/fixtures.html#</a></p>
 
 
-<h3 class="relative group">Terraform 
-    <div id="terraform" class="anchor"></div>
+<h3 class="relative group">8. Terraform 
+    <div id="8-terraform" class="anchor"></div>
     
     <span
         class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
         <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
-            style="text-decoration-line: none !important;" href="#terraform" aria-label="Anchor">#</a>
+            style="text-decoration-line: none !important;" href="#8-terraform" aria-label="Anchor">#</a>
     </span>        
     
 </h3>
-<p>TODO</p>
-
-
-<h3 class="relative group">Source Control 
-    <div id="source-control" class="anchor"></div>
-    
-    <span
-        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
-        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
-            style="text-decoration-line: none !important;" href="#source-control" aria-label="Anchor">#</a>
-    </span>        
-    
-</h3>
-<p>TODO</p>
-
-
-<h2 class="relative group">Technology learned 
-    <div id="technology-learned" class="anchor"></div>
-    
-    <span
-        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
-        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
-            style="text-decoration-line: none !important;" href="#technology-learned" aria-label="Anchor">#</a>
-    </span>        
-    
-</h2>
+<p>Use the existing AWS infrastructure as a reference when writing Terraform for
+this project. Create identical resources with Terraform and then replace the
+original. Leverage AWS CLI commands to gather the required details for
+Terraform definitions. For example, the <a href="https://awscli.amazonaws.com/v2/documentation/api/latest/reference/apigateway/get-method.html" target="_blank">get-method CLI
+command</a> returns the data needed for defining the <a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/api_gateway_method" target="_blank">API Gateway
+method in Terraform</a>.</p>
 <ul>
-<li><a href="https://awscli.amazonaws.com/v2/documentation/api/latest/reference/index.html" target="_blank">AWS CLI</a></li>
-<li><a href="https://gohugo.io/documentation/" target="_blank">Hugo</a></li>
-<li><a href="https://docs.pytest.org/en/stable/" target="_blank">PyTest</a></li>
-<li><a href="https://playwright.dev/python/docs/api/class-playwright" target="_blank">PlayWright for Python</a></li>
-<li><a href="https://developer.hashicorp.com/terraform?product_intent=terraform" target="_blank">Terraform</a></li>
+<li><a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs" target="_blank">Terraform AWS documentation</a></li>
 </ul>
+<p>If you have zero Terraform experience like I did, Rahul Wagh has a fantastic
+video on <a href="https://www.youtube.com/watch?v=JSR7U700h0U" target="_blank">how to create a Lambda function is
+Terraform</a>, which cleared up a lot of confusion.</p>
+<p>For Lambda, utilize the <code>source_code_hash</code> argument to trigger a rebuild
+whenever the Python code changes and remember to create an
+<code>aws_lambda_permission</code> resource for API Gateway when you get there.</p>
+<p>For API Gateway, remember to take care of the SDK generation. I use the
+<code>terraform_data</code> resource to run a bash shell script to update the JavaScript
+files.</p>
+
+
+<h3 class="relative group">9. Source Control 
+    <div id="9-source-control" class="anchor"></div>
+    
+    <span
+        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
+        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
+            style="text-decoration-line: none !important;" href="#9-source-control" aria-label="Anchor">#</a>
+    </span>        
+    
+</h3>
+<p>Git and GitHub</p>
 
 
 <h2 class="relative group">Technology Used 
@@ -1329,12 +1533,38 @@ really challenged me.</p>
     
 </h2>
 <ul>
-<li>Git</li>
-<li>Github</li>
-<li>VSCode</li>
-<li>Ubuntu</li>
-<li>Firefox Developer Tools</li>
+<li>
+<p><a href="https://awscli.amazonaws.com/v2/documentation/api/latest/reference/index.html" target="_blank">AWS CLI</a></p>
+</li>
+<li>
+<p><a href="https://gohugo.io/documentation/" target="_blank">Hugo</a></p>
+</li>
+<li>
+<p><a href="https://docs.pytest.org/en/stable/" target="_blank">pytest</a></p>
+</li>
+<li>
+<p><a href="https://playwright.dev/python/docs/api/class-playwright" target="_blank">PlayWright for Python</a></p>
+</li>
+<li>
+<p><a href="https://developer.hashicorp.com/terraform?product_intent=terraform" target="_blank">Terraform</a></p>
+</li>
+<li>
+<p>Git</p>
+</li>
+<li>
+<p>Github</p>
+</li>
+<li>
+<p>VSCode</p>
+</li>
+<li>
+<p>Ubuntu</p>
+</li>
+<li>
+<p>Firefox Developer Tools</p>
+</li>
 </ul>
+<!-- reference links -->
 
           
           
@@ -1466,7 +1696,7 @@ really challenged me.</p>
 <div
   id="search-wrapper"
   class="invisible fixed inset-0 flex h-screen w-screen cursor-default flex-col bg-neutral-500/50 p-4 backdrop-blur-sm dark:bg-neutral-900/50 sm:p-6 md:p-[10vh] lg:p-[12vh]"
-  data-url="http://localhost:1313/"
+  data-url="https://carsten-singleton.com/"
   style="z-index:500"
 >
   <div

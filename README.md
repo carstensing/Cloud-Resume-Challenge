@@ -20,6 +20,8 @@ the way.
 
 ## Contents <!-- omit from toc -->
 
+## Introduction
+
 - [Introduction](#introduction)
     - [Why Learn Cloud](#why-learn-cloud)
     - [What is the Cloud Resume Challenge](#what-is-the-cloud-resume-challenge)
@@ -38,14 +40,11 @@ the way.
             - [Versioned File Names](#versioned-file-names)
     - [5. AWS CLI](#5-aws-cli)
         - [SSO for CLI](#sso-for-cli)
-        - [Manual Site Update](#manual-site-update)
     - [6. DynamoDB, Lambda, API Gateway and JavaScript](#6-dynamodb-lambda-api-gateway-and-javascript)
-    - [7. PyTests](#7-pytests)
+    - [7. pytests](#7-pytests)
     - [8. Terraform](#8-terraform)
     - [9. Source Control](#9-source-control)
 - [Technology Used](#technology-used)
-
-## Introduction
 
 ### Why Learn Cloud
 
@@ -83,8 +82,8 @@ General outline:
 - **Certification**: Obtain a cloud certification (AWS Certified Cloud
   Practitioner).
 
-- **Frontend**: Create a static website (Hugo for HTML and CSS) and host it
-  using a cloud provider (S3, Route53 and Cloudfront).
+- **Frontend**: Create a static website (Hugo) and host it using a cloud
+  provider (S3, Route53 and CloudFront).
 
 - **Backend**: Implement a visitor counter using a serverless function,
   database and a REST API (Lambda, DynamoDB and API Gateway).
@@ -373,47 +372,6 @@ profiles, to ensure actions are performed with the correct profile.
 [sso_config_for_cli]:
     https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-sso.html#cli-configure-sso-manual
 
-#### Manual Site Update
-
-These steps updated the bucket files and refresh the CloudFront cache. This
-isn't the greatest manual solution but it is close enough. All of these steps will be automated later in the project.
-
-1. Delete and rebuild `src/hugo_site/public/` to refresh Hugo.
-
-    `rm -fr src/hugo_site/public`
-
-    `cd src/hugo_site`
-
-    `hugo`
-
-2. Sign in to AWS SSO.
-
-3. Download the bucket.
-
-    `aws s3 sync s3://carsten-singleton.com old_bucket_files`
-
-4. Add new / updated files from `public/` to the bucket.
-
-    `aws s3 sync src/hugo_site/public s3://carsten-singleton.com`
-
-5. Get the list of files that were deleted in this update.
-
-    `rsync -rvni --ignore-existing old_bucket_files/ src/hugo_site/public/ > files-to-delete.txt`
-
-6. Get rid of the prepended text you don't need in VSCode.
-
-7. Delete files from the bucket that aren't in `public/`.
-
-    `cat files-to-delete.txt | xargs -I {} aws s3 rm "s3://carsten-singleton.com/{}"`
-
-8. Get files to invalidate in CloudFront.
-
-    `rsync -rcni old_bucket_files/ src/hugo_site/public/ > files-to-invalidate.txt`
-
-9. Get rid of the prepended text you don't need in VSCode.
-
-10. Invalidate the files in the AWS console.
-
 ### 6. DynamoDB, Lambda, API Gateway and JavaScript
 
 I learned a **ton** on this chuck of the project. I understood the concept of
@@ -428,16 +386,35 @@ together to slowly. I took these steps:
 
 <https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/programming-with-python.html>
 
-### 7. PyTests
+### 7. pytests
 
-TODO
+When migrating to local development, I wanted to replicate the integrated test
+function available in the Lambda online console. Using pytest enabled me to
+practice test-driven development, automate testing, and accelerate the
+development process.
 
-<https://aws.amazon.com/blogs/devops/unit-testing-aws-lambda-with-python-and-mock-aws-services/>
-<https://docs.pytest.org/en/stable/example/parametrize.html#indirect-parametrization>
+I configured my Python virtual environment to run pytest-watch on startup,
+which automatically runs tests when the source files are saved. Using
+pytest-xdist makes it possible to run tests in parallel, speeding up test
+times. Configuration of pytest.ini is needed to use pytest-xdist automatically
+when pytest-watch runs the tests.
 
-<https://docs.pytest.org/en/stable/how-to/parametrize.html#parametrize>
+To autorun tests:
+    Add to the venv/bin/activate file:
+      gnome-terminal -- bash -c "ptw --ext=.py,.json"
+    If your terminal is different, change "gnome-terminal"
 
-<https://docs.pytest.org/en/stable/how-to/fixtures.html#>
+To give tests access to the src files:
+   Create a file that ends with .pth to venv/lib/python3.13/site-packages.
+   Add this (no spaces) to that file:
+     ../../../../src
+
+```txt
+# pytest.ini
+
+[pytest]
+addopts = -n auto --disable-warnings
+```
 
 ### 8. Terraform
 

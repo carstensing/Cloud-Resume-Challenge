@@ -1,0 +1,61 @@
+{
+    "ResourceRecordSets": [
+        {
+            "Name": "carsten-singleton.com.",
+            "Type": "A",
+            "AliasTarget": {
+                "HostedZoneId": "Z2FDTNDATAQYW2",
+                "DNSName": "dl7wrmt7ck6rj.cloudfront.net.",
+                "EvaluateTargetHealth": false
+            }
+        },
+        {
+            "Name": "carsten-singleton.com.",
+            "Type": "NS",
+            "TTL": 172800,
+            "ResourceRecords": [
+                {
+                    "Value": "ns-860.awsdns-43.net."
+                },
+                {
+                    "Value": "ns-279.awsdns-34.com."
+                },
+                {
+                    "Value": "ns-1705.awsdns-21.co.uk."
+                },
+                {
+                    "Value": "ns-1121.awsdns-12.org."
+                }
+            ]
+        },
+        {
+            "Name": "carsten-singleton.com.",
+            "Type": "SOA",
+            "TTL": 900,
+            "ResourceRecords": [
+                {
+                    "Value": "ns-860.awsdns-43.net. awsdns-hostmaster.amazon.com. 1 7200 900 1209600 86400"
+                }
+            ]
+        },
+        {
+            "Name": "_f8135df5e4707d5985c806794dc8c9d9.carsten-singleton.com.",
+            "Type": "CNAME",
+            "TTL": 300,
+            "ResourceRecords": [
+                {
+                    "Value": "_b70ed421ce9f74cf110881bb89a16e14.zfyfvmchrl.acm-validations.aws."
+                }
+            ]
+        },
+        {
+            "Name": "www.carsten-singleton.com.",
+            "Type": "A",
+            "AliasTarget": {
+                "HostedZoneId": "Z2FDTNDATAQYW2",
+                "DNSName": "d3pp474o6ywnvt.cloudfront.net.",
+                "EvaluateTargetHealth": false
+            }
+        }
+    ]
+}

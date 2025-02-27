@@ -3,25 +3,25 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
 
   <url>
-    <loc>http://localhost:1313/posts/</loc>
+    <loc>https://carsten-singleton.com/posts/</loc>
     <lastmod>2025-01-22T11:15:35-07:00</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>http://localhost:1313/posts/resume/</loc>
+    <loc>https://carsten-singleton.com/posts/resume/</loc>
     <lastmod>2025-01-22T11:15:35-07:00</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>http://localhost:1313/</loc>
+    <loc>https://carsten-singleton.com/</loc>
     <lastmod>2025-01-22T11:15:35-07:00</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>http://localhost:1313/posts/cloud_resume_challenge/</loc>
+    <loc>https://carsten-singleton.com/posts/cloud_resume_challenge/</loc>
     <lastmod>2024-10-17T14:55:59-07:00</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.5</priority>

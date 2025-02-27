@@ -13,10 +13,246 @@ provider "aws" {
   profile = var.aws_profile
 }
 
+# ACM -------------------------------------------------------------------------
+
+resource "aws_acm_certificate" "site_cert" {
+  domain_name               = aws_s3_bucket.site_bucket.bucket
+  subject_alternative_names = ["carsten-singleton.com", "*.carsten-singleton.com"]
+  validation_method         = "DNS"
+  key_algorithm             = "RSA_2048"
+  options {
+    certificate_transparency_logging_preference = "ENABLED"
+  }
+
+  tags = var.tags
+}
+
+resource "aws_acm_certificate_validation" "site_vert_val" {
+  certificate_arn         = aws_acm_certificate.site_cert.arn
+  validation_record_fqdns = [aws_route53_record.site_A.fqdn]
+}
+
+# Route 53 --------------------------------------------------------------------
+
+resource "aws_route53_zone" "primary" {
+  name = aws_s3_bucket.site_bucket.bucket
+
+  tags = var.tags
+}
+
+resource "aws_route53_record" "site_A" {
+  zone_id = aws_route53_zone.primary.zone_id
+  name    = aws_route53_zone.primary.name
+  type    = "A"
+  alias {
+    name                   = aws_cloudfront_distribution.s3_distribution.domain_name
+    zone_id                = aws_route53_zone.primary.id
+    evaluate_target_health = false
+  }
+}
+
+resource "aws_route53_record" "www_A" {
+  zone_id = aws_route53_zone.primary.zone_id
+  name    = "www.${aws_route53_zone.primary.name}"
+  type    = "A"
+  alias {
+    name                   = aws_cloudfront_distribution.s3_distribution.domain_name
+    zone_id                = aws_route53_zone.primary.id
+    evaluate_target_health = false
+  }
+}
+
+resource "aws_route53_record" "site_CNAME" {
+  for_each = {
+    for dvo in aws_acm_certificate.site_cert.domain_validation_options : dvo.domain_name => {
+      name   = dvo.resource_record_name
+      record = dvo.resource_record_value
+      type   = dvo.resource_record_type
+    }
+  }
+
+  allow_overwrite = true
+  name            = each.value.name
+  records         = [each.value.record]
+  ttl             = 300
+  type            = each.value.type
+  zone_id         = aws_route53_zone.primary.zone_id
+}
+
+resource "aws_route53_record" "site_NS" {
+  allow_overwrite = true
+  name            = aws_route53_zone.primary.name
+  ttl             = 172800
+  type            = "NS"
+  zone_id         = aws_route53_zone.primary.zone_id
+
+  records = [
+    aws_route53_zone.primary.name_servers[0],
+    aws_route53_zone.primary.name_servers[1],
+    aws_route53_zone.primary.name_servers[2],
+    aws_route53_zone.primary.name_servers[3],
+  ]
+}
+
+resource "aws_route53_record" "site_SOA" {
+  allow_overwrite = true
+  name            = aws_route53_zone.primary.name
+  ttl             = 900
+  type            = "SOA"
+  zone_id         = aws_route53_zone.primary.zone_id
+
+  records = ["${aws_route53_zone.primary.name_servers[0]} awsdns-hostmaster.amazon.com. 1 7200 900 1209600 86400"]
+}
+
+# CloudFront ------------------------------------------------------------------
+
+locals {
+  s3_origin_id = "site_bucket_origin"
+}
+
+resource "aws_cloudfront_distribution" "s3_distribution" {
+  origin {
+    domain_name         = aws_s3_bucket_website_configuration.site_bucket_config.website_endpoint
+    origin_id           = local.s3_origin_id
+    connection_attempts = 3
+    connection_timeout  = 10
+
+    custom_origin_config {
+      http_port                = 80
+      https_port               = 443
+      origin_protocol_policy   = "http-only"
+      origin_ssl_protocols     = ["SSLv3", "TLSv1", "TLSv1.1", "TLSv1.2"]
+      origin_read_timeout      = 30
+      origin_keepalive_timeout = 5
+    }
+  }
+
+  enabled             = true
+  is_ipv6_enabled     = true
+  default_root_object = "index.html"
+  http_version        = "http2"
+  price_class         = "PriceClass_100"
+
+  default_cache_behavior {
+    # Cache policy: CachingOptimized (Recommended for s3)
+    cache_policy_id        = "658327ea-f89d-4fab-a63d-7e88639e58f6"
+    allowed_methods        = ["GET", "HEAD"]
+    target_origin_id       = local.s3_origin_id
+    viewer_protocol_policy = "redirect-to-https"
+    cached_methods         = ["GET", "HEAD"]
+    smooth_streaming       = false
+    compress               = true
+    grpc_config {
+      enabled = false
+    }
+  }
+
+  restrictions {
+    geo_restriction {
+      restriction_type = "none"
+      locations        = []
+    }
+  }
+
+  viewer_certificate {
+    cloudfront_default_certificate = false
+    acm_certificate_arn            = "arn:aws:acm:us-east-1:050752609485:certificate/c2e11f7d-d9e9-40b4-b2a7-a4149003ba20"
+    ssl_support_method             = "sni-only"
+    minimum_protocol_version       = "TLSv1.2_2021"
+  }
+
+  aliases = [
+    aws_s3_bucket.site_bucket.bucket,
+    "www.${aws_s3_bucket.site_bucket.bucket}"
+  ]
+
+  tags = var.tags
+}
+
+# S3 --------------------------------------------------------------------------
+
+resource "aws_s3_bucket_policy" "bucket_policy" {
+  bucket = aws_s3_bucket.site_bucket.id
+
+  # Terraform's "jsonencode" function converts a
+  # Terraform expression result to valid JSON syntax.
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Sid" : "PublicReadGetObject",
+        "Effect" : "Allow",
+        "Principal" : "*",
+        "Action" : "s3:GetObject",
+        "Resource" : "${aws_s3_bucket.site_bucket.arn}/*"
+      }
+    ]
+  })
+
+  depends_on = [
+    aws_s3_bucket_public_access_block.pab
+  ]
+}
+
+resource "aws_s3_bucket" "site_bucket" {
+  bucket = "carsten-singleton.com"
+
+  tags = var.tags
+}
+
+resource "aws_s3_bucket_website_configuration" "site_bucket_config" {
+  bucket = aws_s3_bucket.site_bucket.id
+
+  index_document {
+    suffix = "index.html"
+  }
+
+  error_document {
+    key = "404.html"
+  }
+}
+
+resource "aws_s3_bucket_public_access_block" "pab" {
+  bucket = aws_s3_bucket.site_bucket.id
+
+  block_public_acls       = false
+  block_public_policy     = false
+  ignore_public_acls      = false
+  restrict_public_buckets = false
+}
+
+locals {
+  hugo_site_path = "${path.module}/../../hugo_site"
+}
+
+data "archive_file" "zip_hugo_site" {
+  type        = "zip"
+  source_dir  = local.hugo_site_path
+  output_path = "${local.hugo_site_path}/hugo_site.zip"
+}
+
+resource "terraform_data" "update_bucket_objects" {
+  triggers_replace = [
+    filebase64sha256(data.archive_file.zip_hugo_site.output_path),
+    aws_s3_bucket.site_bucket
+  ]
+
+  provisioner "local-exec" {
+    command = "./update_bucket.sh"
+  }
+}
+
+# CloudWatch ------------------------------------------------------------------
+
+resource "aws_cloudwatch_log_group" "site_lambda_log_group" {
+  name              = "/aws/lambda/${local.lambda_name}"
+  retention_in_days = 7
+}
+
 # Lambda ----------------------------------------------------------------------
 
 resource "aws_iam_role" "lambda_role" {
-  name = "website_lambda_role"
+  name = "site_lambda_role"
 
   # Terraform's "jsonencode" function converts a
   # Terraform expression result to valid JSON syntax.
@@ -56,7 +292,7 @@ resource "aws_iam_policy" "lambda_policy" {
           "logs:PutLogEvents"
         ],
         "Resource" : [
-          "arn:aws:logs:${var.aws_region}:${var.aws_account_id}:log-group:/aws/lambda/*:*"
+          "arn:aws:logs:${var.aws_region}:${var.aws_account_id}:log-group:/aws/lambda/${local.lambda_name}:*"
         ]
       },
       {
@@ -84,6 +320,7 @@ resource "aws_iam_role_policy_attachment" "attach_policy_to_lambda_role" {
 
 locals {
   lambda_src_path = "${path.module}/lambda/src"
+  lambda_name     = "visitor-count"
 }
 
 data "archive_file" "zip_python_code" {
@@ -96,13 +333,14 @@ data "archive_file" "zip_python_code" {
 resource "aws_lambda_function" "site_lambda_func" {
   filename         = data.archive_file.zip_python_code.output_path
   source_code_hash = filebase64sha256(data.archive_file.zip_python_code.output_path)
-  function_name    = "visitor-count"
+  function_name    = local.lambda_name
   role             = aws_iam_role.lambda_role.arn
   handler          = "lambda_function.lambda_handler"
   runtime          = "python3.13"
 
   depends_on = [
     aws_iam_role_policy_attachment.attach_policy_to_lambda_role,
+    aws_cloudwatch_log_group.site_lambda_log_group,
   ]
 
   environment {
@@ -323,7 +561,7 @@ resource "aws_api_gateway_integration_response" "options_ir_code_200" {
   status_code = aws_api_gateway_method_response.options_mr_code_200.status_code
 
   response_parameters = {
-    "method.response.header.Access-Control-Allow-Headers" : "'Content-Type,Authorization'"
+    "method.response.header.Access-Control-Allow-Headers" : "'Content-Type'"
     "method.response.header.Access-Control-Allow-Methods" : "'GET,OPTIONS'"
     "method.response.header.Access-Control-Allow-Origin" : "'*'"
   }
