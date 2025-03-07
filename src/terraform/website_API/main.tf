@@ -15,13 +15,22 @@ provider "aws" {
 
 # ACM -------------------------------------------------------------------------
 
+locals {
+  domain_name = "carsten-singleton.com"
+}
+
 resource "aws_acm_certificate" "site_cert" {
-  domain_name               = aws_s3_bucket.site_bucket.bucket
-  subject_alternative_names = ["carsten-singleton.com", "*.carsten-singleton.com"]
+  domain_name               = local.domain_name
+  subject_alternative_names = ["${local.domain_name}", "*.${local.domain_name}"]
   validation_method         = "DNS"
   key_algorithm             = "RSA_2048"
+
   options {
     certificate_transparency_logging_preference = "ENABLED"
+  }
+
+  lifecycle {
+    create_before_destroy = true
   }
 
   tags = var.tags
@@ -29,35 +38,63 @@ resource "aws_acm_certificate" "site_cert" {
 
 resource "aws_acm_certificate_validation" "site_vert_val" {
   certificate_arn         = aws_acm_certificate.site_cert.arn
-  validation_record_fqdns = [aws_route53_record.site_A.fqdn]
+  validation_record_fqdns = [for record in aws_route53_record.site_CNAME : record.fqdn]
+}
+
+# Route 53 Domains ------------------------------------------------------------
+
+resource "aws_route53domains_registered_domain" "site_domain" {
+  domain_name = local.domain_name
+
+  name_server {
+    name = aws_route53_zone.primary.name_servers[0]
+  }
+
+  name_server {
+    name = aws_route53_zone.primary.name_servers[1]
+  }
+
+  name_server {
+    name = aws_route53_zone.primary.name_servers[2]
+  }
+
+  name_server {
+    name = aws_route53_zone.primary.name_servers[3]
+  }
+
+  tags = var.tags
 }
 
 # Route 53 --------------------------------------------------------------------
 
 resource "aws_route53_zone" "primary" {
-  name = aws_s3_bucket.site_bucket.bucket
+  name = local.domain_name
 
   tags = var.tags
 }
 
+locals {
+  cloudfront_hosted_zone_id = "Z2FDTNDATAQYW2"
+}
+
 resource "aws_route53_record" "site_A" {
   zone_id = aws_route53_zone.primary.zone_id
-  name    = aws_route53_zone.primary.name
+  name    = local.domain_name
   type    = "A"
   alias {
     name                   = aws_cloudfront_distribution.s3_distribution.domain_name
-    zone_id                = aws_route53_zone.primary.id
+    zone_id                = local.cloudfront_hosted_zone_id
     evaluate_target_health = false
   }
 }
 
 resource "aws_route53_record" "www_A" {
   zone_id = aws_route53_zone.primary.zone_id
-  name    = "www.${aws_route53_zone.primary.name}"
+  name    = "www.${local.domain_name}"
   type    = "A"
   alias {
     name                   = aws_cloudfront_distribution.s3_distribution.domain_name
-    zone_id                = aws_route53_zone.primary.id
+    zone_id                = local.cloudfront_hosted_zone_id
     evaluate_target_health = false
   }
 }
@@ -81,7 +118,7 @@ resource "aws_route53_record" "site_CNAME" {
 
 resource "aws_route53_record" "site_NS" {
   allow_overwrite = true
-  name            = aws_route53_zone.primary.name
+  name            = local.domain_name
   ttl             = 172800
   type            = "NS"
   zone_id         = aws_route53_zone.primary.zone_id
@@ -96,12 +133,12 @@ resource "aws_route53_record" "site_NS" {
 
 resource "aws_route53_record" "site_SOA" {
   allow_overwrite = true
-  name            = aws_route53_zone.primary.name
+  name            = local.domain_name
   ttl             = 900
   type            = "SOA"
   zone_id         = aws_route53_zone.primary.zone_id
 
-  records = ["${aws_route53_zone.primary.name_servers[0]} awsdns-hostmaster.amazon.com. 1 7200 900 1209600 86400"]
+  records = ["${aws_route53_zone.primary.primary_name_server} awsdns-hostmaster.amazon.com. 1 7200 900 1209600 86400"]
 }
 
 # CloudFront ------------------------------------------------------------------
@@ -112,7 +149,7 @@ locals {
 
 resource "aws_cloudfront_distribution" "s3_distribution" {
   origin {
-    domain_name         = aws_s3_bucket_website_configuration.site_bucket_config.website_endpoint
+    domain_name         = aws_s3_bucket.site_bucket.bucket_regional_domain_name
     origin_id           = local.s3_origin_id
     connection_attempts = 3
     connection_timeout  = 10
@@ -162,8 +199,8 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
   }
 
   aliases = [
-    aws_s3_bucket.site_bucket.bucket,
-    "www.${aws_s3_bucket.site_bucket.bucket}"
+    local.domain_name,
+    "www.${local.domain_name}"
   ]
 
   tags = var.tags
@@ -195,7 +232,8 @@ resource "aws_s3_bucket_policy" "bucket_policy" {
 }
 
 resource "aws_s3_bucket" "site_bucket" {
-  bucket = "carsten-singleton.com"
+  bucket        = local.domain_name
+  force_destroy = true
 
   tags = var.tags
 }
@@ -229,6 +267,7 @@ data "archive_file" "zip_hugo_site" {
   type        = "zip"
   source_dir  = local.hugo_site_path
   output_path = "${local.hugo_site_path}/hugo_site.zip"
+  excludes    = ["public", ".hugo_build.lock", "terraform.tfstate", "hugo_site.zip"]
 }
 
 resource "terraform_data" "update_bucket_objects" {
@@ -238,7 +277,21 @@ resource "terraform_data" "update_bucket_objects" {
   ]
 
   provisioner "local-exec" {
-    command = "./update_bucket.sh"
+    command = "./update_bucket.sh ${aws_cloudfront_distribution.s3_distribution.id}"
+  }
+}
+
+resource "aws_s3_bucket" "site_www_redirect_bucket" {
+  bucket = "www.${local.domain_name}"
+
+  tags = var.tags
+}
+
+resource "aws_s3_bucket_website_configuration" "site_www_redirect_bucket_config" {
+  bucket = aws_s3_bucket.site_www_redirect_bucket.id
+
+  redirect_all_requests_to {
+    host_name = local.domain_name
   }
 }
 
@@ -446,6 +499,8 @@ resource "aws_api_gateway_stage" "production_stage" {
   deployment_id = aws_api_gateway_deployment.dep.id
   rest_api_id   = aws_api_gateway_rest_api.site_API.id
   stage_name    = "production"
+
+  tags = var.tags
 }
 
 resource "aws_api_gateway_resource" "visitor_counter" {

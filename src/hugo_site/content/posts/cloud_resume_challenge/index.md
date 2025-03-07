@@ -427,14 +427,14 @@ To give tests access to the src files:
    Add this (no spaces) to that file:
      ../../../../src
 
-```
+```ini
 # pytest.ini
 
 [pytest]
 addopts = -n auto --disable-warnings
 ```
 
-TODO
+TODO!
 
 <https://aws.amazon.com/blogs/devops/unit-testing-aws-lambda-with-python-and-mock-aws-services/>
 <https://docs.pytest.org/en/stable/example/parametrize.html#indirect-parametrization>
