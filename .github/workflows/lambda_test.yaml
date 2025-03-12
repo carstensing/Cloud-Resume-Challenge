@@ -1,4 +1,4 @@
-name: Test Lambda Python
+name: Lambda Test
 
 on:
   push:
@@ -8,10 +8,13 @@ permissions:
   contents: read
 
 jobs:
-  build:
+  run-tests:
+    name: Run pytest for Lambda
     runs-on: ubuntu-latest
     env:
       PYTHON-VERSION: "3.13"
+      LAMBDA_PATH: "src/terraform/lambda"
+      AWS_REGION: "us-west-1"
 
     steps:
     - uses: actions/checkout@v4
@@ -24,13 +27,18 @@ jobs:
     - name: Install dependencies
       run: |
         python3 -m pip install --upgrade pip
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        if [ -f "${{ env.LAMBDA_PATH }}/requirements.txt" ]; then
+          pip install -r "${{ env.LAMBDA_PATH }}/requirements.txt"
+        fi
     - name: Test with pytest
-      run: pytest src/terraform/lambda/test/unit_tests/test_lambda.py --html=src/terraform/lambda/test/test-results-${{ env.PYTHON-VERSION }}.html --self-contained-html
+      run: |
+        pytest "${{ env.LAMBDA_PATH }}/test/unit_tests/test_lambda.py" \
+        --html="${{ env.LAMBDA_PATH }}/test/test-results.html" \
+        --self-contained-html
     - name: Upload pytest test results
       uses: actions/upload-artifact@v4
       with:
-        name: pytest-results-${{ env.PYTHON-VERSION }}
-        path: src/terraform/lambda/test/test-results-${{ env.PYTHON-VERSION }}.html
+        name: pytest-results
+        path: "${{ env.LAMBDA_PATH }}/test/test-results.html"
       # Use always() to always run this step to publish test results when there are test failures
       if: ${{ always() }}

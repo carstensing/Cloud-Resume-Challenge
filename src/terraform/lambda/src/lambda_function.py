@@ -1,6 +1,6 @@
 import sys
+import os
 from hashlib import pbkdf2_hmac
-from os import environ
 
 import boto3
 
@@ -8,6 +8,12 @@ from date_utils import date_compare
 
 # Visitors get recounted if they revisit the site after a this amount of time.
 NUM_DAYS_TILL_EXPIRATION = 14
+
+session_region = boto3.Session().region_name
+if session_region:
+    REGION = session_region
+else:
+    REGION = "us-west-1"
 
 if sys.version_info[0:2] != (3, 13):
     raise Exception("Requires python 3.13")
@@ -17,13 +23,14 @@ if sys.version_info[0:2] != (3, 13):
 # account.
 class DynamoDBClass:
     def __init__(self, table_name):
-        self.resource = boto3.resource("dynamodb")
+        self.resource = boto3.resource("dynamodb", REGION)
         self.table_name = table_name
         self.table = self.resource.Table(self.table_name)
 
 
-_DATA_TBL = DynamoDBClass(environ.get("data_tbl", "None"))
-_VISITOR_TBL = DynamoDBClass(environ.get("visitor_tbl", "None"))
+# Get table names from environment variables.
+_DATA_TBL = DynamoDBClass(os.environ.get("data_tbl", "None"))
+_VISITOR_TBL = DynamoDBClass(os.environ.get("visitor_tbl", "None"))
 
 
 def get_num_visitors(data_tbl: DynamoDBClass) -> int:

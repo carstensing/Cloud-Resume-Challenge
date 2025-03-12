@@ -1,5 +1,9 @@
 # Cloud Resume Challenge <!-- omit from toc -->
 
+<!-- badges -->
+
+
+
 The [**Cloud Resume Challenge**][cloud_resume_challenge] is a multi-step
 project designed to help aspiring cloud developers gain real-world experience
 with cloud technologies by building and deploying a **personal resume

@@ -18,8 +18,7 @@ import lambda_function as lam_func
 from lambda_function import DynamoDBClass
 from date_utils import date_compare
 
-
-REGION = "us-west-1"
+REGION = lam_func.REGION
 
 
 @pytest.fixture()
