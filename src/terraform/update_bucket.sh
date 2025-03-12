@@ -2,7 +2,7 @@
 
 cloudfront_dist="${1}"
 site_bucket="s3://carsten-singleton.com"
-public_path="../../hugo_site/public"
+public_path="../hugo_site/public"
 escaped_public_path=$(echo "${public_path}" | sed 's|/|\\/|g')  # Escape `/` for Perl.
 bucket_download_dir="bucket_files"
 output_files=("diff_bucket_and_public.txt" 
@@ -12,8 +12,8 @@ output_files=("diff_bucket_and_public.txt"
               "invalidations.txt" 
               "batch_invalidations.json")
 
-rm -fr ../../hugo_site/public
-hugo -D -s ../../hugo_site
+rm -fr ../hugo_site/public
+hugo -D -s ../hugo_site
 echo "public/ updated."
 
 #             source         destination

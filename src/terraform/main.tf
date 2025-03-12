@@ -149,7 +149,7 @@ locals {
 
 resource "aws_cloudfront_distribution" "s3_distribution" {
   origin {
-    domain_name         = aws_s3_bucket.site_bucket.bucket_regional_domain_name
+    domain_name         = aws_s3_bucket_website_configuration.site_bucket_config.website_endpoint
     origin_id           = local.s3_origin_id
     connection_attempts = 3
     connection_timeout  = 10
@@ -260,7 +260,7 @@ resource "aws_s3_bucket_public_access_block" "pab" {
 }
 
 locals {
-  hugo_site_path = "${path.module}/../../hugo_site"
+  hugo_site_path = "${path.module}/../hugo_site"
 }
 
 data "archive_file" "zip_hugo_site" {

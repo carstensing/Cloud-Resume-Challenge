@@ -1,14 +1,23 @@
 import json
 import os
 import random
+import sys
 
 import boto3
 import pytest
 from moto import mock_aws
 
+# Add project source directory to sys.path
+script_path = os.path.abspath(__file__)  # Full path of the current script
+script_dir = os.path.dirname(script_path)  # Directory of the script
+src_dir = os.path.join(script_dir, "../../src")
+sys.path.append(src_dir)
+
+# Local imports (after modifying sys.path)
 import lambda_function as lam_func
-from date_utils import date_compare
 from lambda_function import DynamoDBClass
+from date_utils import date_compare
+
 
 REGION = "us-west-1"
 
@@ -69,7 +78,7 @@ def get_test_data(file_name: str) -> list:
     file_path = f"{dir_path}/../test_data/{file_name}.json"
 
     # Get json data.
-    with open(file_path, "r") as f:
+    with open(file_path, mode="r", encoding="utf-8") as f:
         test_data: list = json.load(f)
 
     return test_data

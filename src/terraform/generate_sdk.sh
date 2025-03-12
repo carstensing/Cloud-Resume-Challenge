@@ -11,8 +11,8 @@ aws apigateway get-sdk \
 
 unzip ${sdk_dir_name}.zip
 
-rm -fr ../../hugo_site/assets/js/${sdk_dir_name}
+rm -fr ../hugo_site/assets/js/${sdk_dir_name}
 
-mv apiGateway-js-sdk ../../hugo_site/assets/js/${sdk_dir_name}
+mv apiGateway-js-sdk ../hugo_site/assets/js/${sdk_dir_name}
 
 rm -fr ${sdk_dir_name}.zip

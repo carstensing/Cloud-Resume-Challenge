@@ -3,6 +3,7 @@
 # ------------------------------------------------------------------------------
 hugo_site.zip
 lambda_payload.zip
+lambda-env
 
 # ------------------------------------------------------------------------------
 # Hugo
@@ -88,7 +89,8 @@ pytestdebug.log
 # Terraform
 # ------------------------------------------------------------------------------
 # Local .terraform directories
-**/.terraform/*
+.terraform/
+hashicorp/
 
 # .tfstate files
 *.tfstate

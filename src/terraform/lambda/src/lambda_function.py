@@ -132,19 +132,27 @@ def counted_visitor(
 
 
 # Main Lambda function.
-def lambda_handler(event: dict = {}, context: dict = {}) -> dict:
-    response = {}
+def lambda_handler(event: dict, context: dict) -> dict:
+    """Main function invoked by Lambda that processes incoming HTTP requests.
 
-    global _DATA_TBL
-    global _VISITOR_TBL
+    Args:
+        event (dict): Information about the function invocation and execution
+            environment defined in integration request template in
+            API Gateway.
+        context (dict): Information about the function invocation and execution
+            environment provided by AWS.
+
+    Returns:
+        dict: Request response.
+    """
+    response = {}
 
     if "http_method" in event:
         match event["http_method"]:
             case "GET":
                 ip = event["source_ip"]
-                # TODO refactor user-agent to user_agent
                 browser = event["user-agent"]
-                counted, visitor = counted_visitor(ip, browser, _VISITOR_TBL)
+                counted, _ = counted_visitor(ip, browser, _VISITOR_TBL)
 
                 if counted:
                     num_visitors = get_num_visitors(_DATA_TBL)
@@ -160,7 +168,7 @@ def lambda_handler(event: dict = {}, context: dict = {}) -> dict:
                 response = {"Error": "Empty HTTP method"}
 
             case _:
-                response = {"Error": "'{0}' is not valid".format(event["http_method"])}
+                response = {"Error": f"'{event["http_method"]}' is not valid"}
     else:
         response = {"Error": "No HTTP method"}
 

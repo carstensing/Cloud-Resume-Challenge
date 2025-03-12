@@ -90,7 +90,7 @@ General outline:
 
 - **Infrastructure as Code (IaC)**: Automate deployments with Terraform.
 
-- **CI/CD**: Set up automated testing (PyTest and PlayWright) and deployment
+- **CI/CD**: Set up automated testing (pytest and PlayWright) and deployment
   pipelines (GitHub Actions).
 
 <!-- reference links -->
@@ -404,12 +404,7 @@ To autorun tests:
       gnome-terminal -- bash -c "ptw --ext=.py,.json"
     If your terminal is different, change "gnome-terminal"
 
-To give tests access to the src files:
-   Create a file that ends with .pth to venv/lib/python3.13/site-packages.
-   Add this (no spaces) to that file:
-     ../../../../src
-
-```txt
+```ini
 # pytest.ini
 
 [pytest]
@@ -459,9 +454,15 @@ Git and GitHub
 
 - [AWS CLI][aws_cli]
 - [Hugo][hugo]
-- [PyTest][pytest]
+- [pytest][pytest]
 - [PlayWright for Python][playwright_for_python]
 - [Terraform][terraform]
+
+- Git
+- Github
+- VSCode
+- Ubuntu
+- Firefox Developer Tools
 
 <!-- reference links -->
 
@@ -485,9 +486,3 @@ Git and GitHub
 
 [terraform]:
     https://developer.hashicorp.com/terraform?product_intent=terraform
-
-- Git
-- Github
-- VSCode
-- Ubuntu
-- Firefox Developer Tools

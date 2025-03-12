@@ -157,7 +157,7 @@
     
     
     "mainEntityOfPage": "true",
-    "wordCount": "2260"
+    "wordCount": "2075"
   }]
   </script>
 
@@ -798,7 +798,6 @@
         <li><a href="#5-aws-cli">5. AWS CLI</a>
           <ul>
             <li><a href="#sso-for-cli">SSO for CLI</a></li>
-            <li><a href="#manual-site-update">Manual Site Update</a></li>
           </ul>
         </li>
         <li><a href="#6-dynamodb-lambda-api-gateway-and-javascript">6. DynamoDB, Lambda, API Gateway and JavaScript</a></li>
@@ -848,7 +847,6 @@
         <li><a href="#5-aws-cli">5. AWS CLI</a>
           <ul>
             <li><a href="#sso-for-cli">SSO for CLI</a></li>
-            <li><a href="#manual-site-update">Manual Site Update</a></li>
           </ul>
         </li>
         <li><a href="#6-dynamodb-lambda-api-gateway-and-javascript">6. DynamoDB, Lambda, API Gateway and JavaScript</a></li>
@@ -953,6 +951,7 @@ website</strong>.</p>
 <p>This repo showcases my journey through the challenge and what I learned along
 the way.</p>
 <p><strong>Check out my website at <a href="https://carsten-singleton.com" target="_blank">carsten-singleton.com</a>.</strong></p>
+<!-- reference links -->
 
 
 <h2 class="relative group">Introduction 
@@ -1365,60 +1364,6 @@ profiles, to ensure actions are performed with the correct profile.</p>
 <!-- reference links -->
 
 
-<h4 class="relative group">Manual Site Update 
-    <div id="manual-site-update" class="anchor"></div>
-    
-    <span
-        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
-        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
-            style="text-decoration-line: none !important;" href="#manual-site-update" aria-label="Anchor">#</a>
-    </span>        
-    
-</h4>
-<p>These steps updated the bucket files and refresh the CloudFront cache. This
-isn&rsquo;t the greatest manual solution but it is close enough. All of these steps will be automated later in the project.</p>
-<ol>
-<li>
-<p>Delete and rebuild <code>src/hugo_site/public/</code> to refresh Hugo.</p>
-<p><code>rm -fr src/hugo_site/public</code></p>
-<p><code>cd src/hugo_site</code></p>
-<p><code>hugo</code></p>
-</li>
-<li>
-<p>Sign in to AWS SSO.</p>
-</li>
-<li>
-<p>Download the bucket.</p>
-<p><code>aws s3 sync s3://carsten-singleton.com old_bucket_files</code></p>
-</li>
-<li>
-<p>Add new / updated files from <code>public/</code> to the bucket.</p>
-<p><code>aws s3 sync src/hugo_site/public s3://carsten-singleton.com</code></p>
-</li>
-<li>
-<p>Get the list of files that were deleted in this update.</p>
-<p><code>rsync -rvni --ignore-existing old_bucket_files/ src/hugo_site/public/ &gt; files-to-delete.txt</code></p>
-</li>
-<li>
-<p>Get rid of the prepended text you don&rsquo;t need in VSCode.</p>
-</li>
-<li>
-<p>Delete files from the bucket that aren&rsquo;t in <code>public/</code>.</p>
-<p><code>cat files-to-delete.txt | xargs -I {} aws s3 rm &quot;s3://carsten-singleton.com/{}&quot;</code></p>
-</li>
-<li>
-<p>Get files to invalidate in CloudFront.</p>
-<p><code>rsync -rcni old_bucket_files/ src/hugo_site/public/ &gt; files-to-invalidate.txt</code></p>
-</li>
-<li>
-<p>Get rid of the prepended text you don&rsquo;t need in VSCode.</p>
-</li>
-<li>
-<p>Invalidate the files in the AWS console.</p>
-</li>
-</ol>
-
-
 <h3 class="relative group">6. DynamoDB, Lambda, API Gateway and JavaScript 
     <div id="6-dynamodb-lambda-api-gateway-and-javascript" class="anchor"></div>
     
@@ -1464,20 +1409,12 @@ when pytest-watch runs the tests.</p>
 Add to the venv/bin/activate file:
 gnome-terminal &ndash; bash -c &ldquo;ptw &ndash;ext=.py,.json&rdquo;
 If your terminal is different, change &ldquo;gnome-terminal&rdquo;</p>
-<p>To give tests access to the src files:
-Create a file that ends with .pth to venv/lib/python3.13/site-packages.
-Add this (no spaces) to that file:
-../../../../src</p>
+<p>TODO</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ini" data-lang="ini"><span class="line"><span class="cl"><span class="c1"># pytest.ini</span>
 </span></span><span class="line"><span class="cl">
 </span></span><span class="line"><span class="cl"><span class="k">[pytest]</span>
 </span></span><span class="line"><span class="cl"><span class="na">addopts</span> <span class="o">=</span> <span class="s">-n auto --disable-warnings</span>
-</span></span></code></pre></div><p>TODO!</p>
-<p><a href="https://aws.amazon.com/blogs/devops/unit-testing-aws-lambda-with-python-and-mock-aws-services/" target="_blank">https://aws.amazon.com/blogs/devops/unit-testing-aws-lambda-with-python-and-mock-aws-services/</a>
-<a href="https://docs.pytest.org/en/stable/example/parametrize.html#indirect-parametrization" target="_blank">https://docs.pytest.org/en/stable/example/parametrize.html#indirect-parametrization</a></p>
-<p><a href="https://docs.pytest.org/en/stable/how-to/parametrize.html#parametrize" target="_blank">https://docs.pytest.org/en/stable/how-to/parametrize.html#parametrize</a></p>
-<p><a href="https://docs.pytest.org/en/stable/how-to/fixtures.html#" target="_blank">https://docs.pytest.org/en/stable/how-to/fixtures.html#</a></p>
-
+</span></span></code></pre></div>
 
 <h3 class="relative group">8. Terraform 
     <div id="8-terraform" class="anchor"></div>
