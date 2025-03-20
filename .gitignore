@@ -1,17 +1,17 @@
 # ------------------------------------------------------------------------------
-# Me
+# Files created by 
 # ------------------------------------------------------------------------------
 hugo_site.zip
 lambda_payload.zip
-lambda-env
+lambda-env/
 
 # ------------------------------------------------------------------------------
 # Hugo
 # ------------------------------------------------------------------------------
 # Generated files by hugo
-/public/
-/resources/_gen/
-/assets/jsconfig.json
+**/hugo_site/public/
+**/hugo_site/resources/_gen/
+**/hugo_site/assets/jsconfig.json
 hugo_stats.json
 
 # Executable may be added to repository
@@ -20,7 +20,7 @@ hugo.darwin
 hugo.linux
 
 # Temporary lock file while building
-/.hugo_build.lock
+**/hugo_site/.hugo_build.lock
 
 # ------------------------------------------------------------------------------
 # pytest

@@ -2,7 +2,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 5.0"
+      version = "~> 5.9"
     }
   }
 }
@@ -32,6 +32,8 @@ resource "aws_acm_certificate" "site_cert" {
   lifecycle {
     create_before_destroy = true
   }
+
+  depends_on = [aws_route53_zone.primary]
 
   tags = var.tags
 }
@@ -70,8 +72,17 @@ resource "aws_route53domains_registered_domain" "site_domain" {
 resource "aws_route53_zone" "primary" {
   name = local.domain_name
 
+  depends_on = [
+    aws_s3_bucket.site_bucket,
+    aws_s3_bucket.site_www_redirect_bucket,
+    aws_cloudfront_distribution.s3_distribution
+  ]
+
   tags = var.tags
 }
+
+# Special hosted zone ID is used when creating an alias record in Route 53 that
+# points to a CloudFront distribution.
 
 locals {
   cloudfront_hosted_zone_id = "Z2FDTNDATAQYW2"
@@ -283,6 +294,8 @@ resource "terraform_data" "update_bucket_objects" {
 
 resource "aws_s3_bucket" "site_www_redirect_bucket" {
   bucket = "www.${local.domain_name}"
+
+  force_destroy = true
 
   tags = var.tags
 }

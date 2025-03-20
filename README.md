@@ -2,7 +2,7 @@
 
 <!-- badges -->
 
-
+[![Lambda Test](https://github.com/carstensing/Cloud-Resume-Challenge/actions/workflows/lambda_test.yaml/badge.svg)](https://github.com/carstensing/Cloud-Resume-Challenge/actions/workflows/lambda_test.yaml)
 
 The [**Cloud Resume Challenge**][cloud_resume_challenge] is a multi-step
 project designed to help aspiring cloud developers gain real-world experience
