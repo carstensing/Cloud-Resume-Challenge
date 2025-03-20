@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       PYTHON-VERSION: "3.13"
-      LAMBDA_PATH: "src/terraform/lambda"
+      LAMBDA_TEST_PATH: "backend/test/lambda"
       AWS_REGION: "us-west-1"
 
     steps:
@@ -27,18 +27,18 @@ jobs:
     - name: Install dependencies
       run: |
         python3 -m pip install --upgrade pip
-        if [ -f "${{ env.LAMBDA_PATH }}/requirements.txt" ]; then
-          pip install -r "${{ env.LAMBDA_PATH }}/requirements.txt"
+        if [ -f "${{ env.LAMBDA_TEST_PATH }}/requirements.txt" ]; then
+          pip install -r "${{ env.LAMBDA_TEST_PATH }}/requirements.txt"
         fi
     - name: Test with pytest
       run: |
-        pytest "${{ env.LAMBDA_PATH }}/test/unit_tests/test_lambda.py" \
-        --html="${{ env.LAMBDA_PATH }}/test/test-results.html" \
+        pytest "${{ env.LAMBDA_TEST_PATH }}/unit_tests/test_lambda.py" \
+        --html="${{ env.LAMBDA_TEST_PATH }}/test-results.html" \
         --self-contained-html
     - name: Upload pytest test results
       uses: actions/upload-artifact@v4
       with:
         name: pytest-results
-        path: "${{ env.LAMBDA_PATH }}/test/test-results.html"
+        path: "${{ env.LAMBDA_TEST_PATH }}/test-results.html"
       # Use always() to always run this step to publish test results when there are test failures
       if: ${{ always() }}
