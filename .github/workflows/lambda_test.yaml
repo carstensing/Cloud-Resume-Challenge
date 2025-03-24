@@ -5,14 +5,13 @@ on:
     branches: [ "main", "dev" ]
 
 permissions:
-  contents: read
+  contents: read # Required for actions/checkout
 
 jobs:
   run-tests:
     name: Run pytest for Lambda
     runs-on: ubuntu-latest
     env:
-      PYTHON-VERSION: "3.13"
       LAMBDA_TEST_PATH: "backend/test/lambda"
       AWS_REGION: "us-west-1"
 
@@ -21,7 +20,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: ${{ env.PYTHON-VERSION }}
+        python-version: "3.13"
         architecture: "x64"
         cache: "pip"
     - name: Install dependencies

@@ -1,0 +1,27 @@
+name: Update S3 Bucket
+
+on:
+  push:
+    branches: [ "main", "dev" ]
+
+permissions:
+  contents: read # Required for actions/checkout
+  id-token: write # Required to request JSON Web Token for OIDC
+
+jobs:
+  AssumeRoleAndCallIdentity:
+    runs-on: ubuntu-latest
+    env:
+      AWS_REGION: "us-west-1"
+
+    steps:
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: "arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHubActionsRole"
+        role-session-name: GitHub_to_AWS_via_FederatedOIDC
+        aws-region: "${{ env.AWS_REGION }}"
+
+    - name: Sts GetCallerIdentity
+      run: |
+        aws sts get-caller-identity
