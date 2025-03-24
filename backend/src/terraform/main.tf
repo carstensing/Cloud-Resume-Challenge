@@ -5,12 +5,19 @@ terraform {
       version = "~> 5.9"
     }
   }
+
+  # Remote state file in S3.
+  backend "s3" {
+    bucket       = "carsten-singleton.com-terraform-state"
+    key          = "terraform.tfstate"
+    region       = "us-west-1"
+    use_lockfile = true
+  }
 }
 
-# Configure the AWS Provider
 provider "aws" {
-  region  = var.aws_region
-  profile = var.aws_profile
+  region = var.aws_region
+  # profile = var.aws_profile
 }
 
 # ACM -------------------------------------------------------------------------
@@ -281,9 +288,31 @@ data "archive_file" "zip_hugo_site" {
   excludes    = ["public", ".hugo_build.lock", "terraform.tfstate", "hugo_site.zip"]
 }
 
+resource "terraform_data" "generate_hugo_site_sha256" {
+  triggers_replace = [
+    data.archive_file.zip_hugo_site
+  ]
+
+  provisioner "local-exec" {
+    command = <<EOT
+      cd "${local.hugo_site_path}"
+      sha256sum hugo_site.zip | awk '{print $1}' > hugo_site.zip.sha256
+      rm -f hugo_site.zip
+    EOT
+  }
+}
+
+data "local_file" "hugo_site_sha256" {
+  filename = "${local.hugo_site_path}/hugo_site.zip.sha256"
+
+  depends_on = [
+    terraform_data.generate_hugo_site_sha256
+  ]
+}
+
 resource "terraform_data" "update_bucket_objects" {
   triggers_replace = [
-    filebase64sha256(data.archive_file.zip_hugo_site.output_path),
+    data.local_file.hugo_site_sha256,
     aws_s3_bucket.site_bucket
   ]
 
@@ -318,7 +347,7 @@ resource "aws_cloudwatch_log_group" "site_lambda_log_group" {
 # Lambda ----------------------------------------------------------------------
 
 resource "aws_iam_role" "lambda_role" {
-  name = "site_lambda_role"
+  name = "LambdaSiteRole"
 
   # Terraform's "jsonencode" function converts a
   # Terraform expression result to valid JSON syntax.
@@ -339,7 +368,7 @@ resource "aws_iam_role" "lambda_role" {
 }
 
 resource "aws_iam_policy" "lambda_policy" {
-  name = "site_lambda_policy"
+  name = "LambdaSitePolicy"
 
   # Terraform's "jsonencode" function converts a
   # Terraform expression result to valid JSON syntax.

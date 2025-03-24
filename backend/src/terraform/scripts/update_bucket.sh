@@ -1,4 +1,4 @@
-#! /usr/bin/bash
+#!/usr/bin/bash
 
 cloudfront_dist="${1}"
 site_bucket="s3://carsten-singleton.com"

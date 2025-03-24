@@ -1,8 +1,8 @@
 # ------------------------------------------------------------------------------
 # Files created by dev
 # ------------------------------------------------------------------------------
-hugo_site.zip
-lambda_payload.zip
+# hugo_site.zip
+# lambda_payload.zip
 *env/
 .env
 .secrets
@@ -10,6 +10,8 @@ lambda_payload.zip
 Dockerfile
 act/
 run_actions.sh
+push.sh
+test.sh
 
 # ------------------------------------------------------------------------------
 # Hugo
