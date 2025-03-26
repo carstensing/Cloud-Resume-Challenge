@@ -25,10 +25,15 @@ jobs:
 
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v4
+      # with:
+      #   role-to-assume: "arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHubActionsRole"
+      #   role-session-name: GitHub_to_AWS_via_FederatedOIDC
+      #   aws-region: "${{ env.AWS_REGION }}"
       with:
-        role-to-assume: "arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHubActionsRole"
-        role-session-name: GitHub_to_AWS_via_FederatedOIDC
-        aws-region: "${{ env.AWS_REGION }}"
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-session-token: ${{ secrets.SESSION_TOKEN }}
+        aws-region: ${{ secrets.AWS_REGION }}
       
     - name: Install Hugo
       run: |

@@ -18,7 +18,7 @@ hugo -D -s "${hugo_site_path}"
 echo "public/ updated."
 
 #             source         destination
-aws s3 sync "${site_bucket}" "${bucket_download_dir}"
+aws s3 sync "${site_bucket}" "${bucket_download_dir}" --quiet
 echo "Bucket downloaded."
 
 diff -rq "${bucket_download_dir}" "${hugo_public_path}" > "${output_files[0]}"

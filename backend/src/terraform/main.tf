@@ -16,8 +16,8 @@ terraform {
 }
 
 provider "aws" {
-  region = var.aws_region
-  # profile = var.aws_profile
+  region  = var.aws_region
+  profile = var.aws_profile # TODO make this variable for github actions
 }
 
 # ACM -------------------------------------------------------------------------
@@ -277,42 +277,13 @@ resource "aws_s3_bucket_public_access_block" "pab" {
   restrict_public_buckets = false
 }
 
-locals {
-  hugo_site_path = "${path.module}/../../../frontend/src/hugo_site"
-}
-
-data "archive_file" "zip_hugo_site" {
-  type        = "zip"
-  source_dir  = local.hugo_site_path
-  output_path = "${local.hugo_site_path}/hugo_site.zip"
-  excludes    = ["public", ".hugo_build.lock", "terraform.tfstate", "hugo_site.zip"]
-}
-
-resource "terraform_data" "generate_hugo_site_sha256" {
-  triggers_replace = [
-    data.archive_file.zip_hugo_site
-  ]
-
-  provisioner "local-exec" {
-    command = <<EOT
-      cd "${local.hugo_site_path}"
-      sha256sum hugo_site.zip | awk '{print $1}' > hugo_site.zip.sha256
-      rm -f hugo_site.zip
-    EOT
-  }
-}
-
-data "local_file" "hugo_site_sha256" {
-  filename = "${local.hugo_site_path}/hugo_site.zip.sha256"
-
-  depends_on = [
-    terraform_data.generate_hugo_site_sha256
-  ]
+data "external" "hugo_site_hash" {
+  program = ["./scripts/hash_site.sh"]
 }
 
 resource "terraform_data" "update_bucket_objects" {
   triggers_replace = [
-    data.local_file.hugo_site_sha256,
+    data.external.hugo_site_hash.result.hash,
     aws_s3_bucket.site_bucket
   ]
 
