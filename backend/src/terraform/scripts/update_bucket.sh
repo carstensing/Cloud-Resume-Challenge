@@ -13,9 +13,11 @@ output_files=("diff_bucket_and_public.txt"
               "invalidations.txt" 
               "batch_invalidations.json")
 
-rm -fr "${hugo_public_path}"
-hugo -D -s "${hugo_site_path}"
-echo "public/ updated."
+# rm -fr "${hugo_public_path}"
+# hugo -D -v -s "${hugo_site_path}"
+# echo "public/ updated."
+
+ls "${hugo_public_path}"
 
 #             source         destination
 aws s3 sync "${site_bucket}" "${bucket_download_dir}" --quiet

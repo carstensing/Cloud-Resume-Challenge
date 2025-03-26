@@ -13,7 +13,10 @@ jobs:
   run-terraform:
     runs-on: ubuntu-latest
     env:
-      AWS_REGION: "us-west-1"
+        TF_VAR_aws_region: ${{ vars.AWS_REGION }}
+        TF_VAR_aws_account_id: ${{ secrets.AWS_ACCOUNT_ID }}
+        TF_VAR_tags: ${{ vars.TAGS }}
+        TF_VAR_aws_profile: null
 
     defaults:
       run:
@@ -22,23 +25,39 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+      with:
+        submodules: true  # Fetch Hugo themes (true OR recursive)
 
-    - name: Configure AWS Credentials
+    - name: Configure AWS Credentials (OIDC)
       uses: aws-actions/configure-aws-credentials@v4
-      # with:
-      #   role-to-assume: "arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHubActionsRole"
-      #   role-session-name: GitHub_to_AWS_via_FederatedOIDC
-      #   aws-region: "${{ env.AWS_REGION }}"
+      if: ${{ !vars.LOCAL_DEVELOPMENT }}
+      with:
+        role-to-assume: "arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHubActionsRole"
+        role-session-name: GitHub_to_AWS_via_FederatedOIDC
+        aws-region: ${{ vars.AWS_REGION }}
+
+    - name: Configure AWS Credentials (SSO)
+      uses: aws-actions/configure-aws-credentials@v4  
+      if: ${{ vars.LOCAL_DEVELOPMENT }}
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-session-token: ${{ secrets.SESSION_TOKEN }}
-        aws-region: ${{ secrets.AWS_REGION }}
+        aws-region: ${{ vars.AWS_REGION }}
       
-    - name: Install Hugo
-      run: |
-        sudo apt-get update
-        sudo apt-get install hugo -y
+    - name: Setup Hugo
+      uses: peaceiris/actions-hugo@v3
+      with:
+        hugo-version: "0.123.7"
+        extended: true
+
+    - name: Update Hugo Theme
+      run: git submodule update --remote --merge
+      working-directory: ${{ github.workspace }}
+
+    - name: Build Hugo
+      run: hugo -D
+      working-directory: frontend/src/hugo_site
 
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v3
@@ -46,29 +65,13 @@ jobs:
         terraform_version: latest
 
     - name: Initialize Terraform
-      run: | 
-        pwd
-        terraform init
+      run: terraform init
 
     - name: Validate Terraform
-      run: |
-        pwd
-        terraform validate
+      run: terraform validate
 
     - name: Plan Terraform changes
-      run: |
-        pwd
-        terraform plan
-      env:
-        TF_VAR_aws_region: ${{ vars.AWS_REGION }}
-        TF_VAR_aws_account_id: ${{ secrets.AWS_ACCOUNT_ID }}
-        TF_VAR_tags: ${{ vars.TAGS }}
-        TF_VAR_aws_profile: null
+      run: terraform plan
 
     - name: Apply Terraform changes
       run: terraform apply -auto-approve
-      env:
-        TF_VAR_aws_region: ${{ vars.AWS_REGION }}
-        TF_VAR_aws_account_id: ${{ secrets.AWS_ACCOUNT_ID }}
-        TF_VAR_tags: ${{ vars.TAGS }}
-        TF_VAR_aws_profile: null

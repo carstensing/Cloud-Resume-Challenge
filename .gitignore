@@ -2,14 +2,12 @@
 # Files created by dev
 # ------------------------------------------------------------------------------
 *env/
-.env
-.secrets
-*artifacts/
-Dockerfile
-act/
-run_actions.sh
+**/*.secrets
 push.sh
 test.sh
+act/artifacts/
+act_output.txt
+local_output.txt
 
 # ------------------------------------------------------------------------------
 # Hugo

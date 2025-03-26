@@ -13,7 +13,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       LAMBDA_TEST_PATH: "backend/test/lambda"
-      AWS_REGION: "us-west-1"
 
     steps:
     - uses: actions/checkout@v4
