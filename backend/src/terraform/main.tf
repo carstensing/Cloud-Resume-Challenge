@@ -16,7 +16,7 @@ terraform {
 }
 
 provider "aws" {
-  region  = var.aws_region
+  region = var.aws_region
 }
 
 # ACM -------------------------------------------------------------------------
@@ -283,12 +283,20 @@ data "external" "hugo_site_hash" {
 resource "terraform_data" "update_bucket_objects" {
   triggers_replace = [
     data.external.hugo_site_hash.result.hash,
-    aws_s3_bucket.site_bucket
+    # Don't hash the bucket if you want to see what exactly is being modified
+    # in the Terraform plan stage.
+    sha1(jsonencode([
+      aws_s3_bucket.site_bucket
+    ]))
   ]
 
   provisioner "local-exec" {
     command = "./scripts/update_bucket.sh ${aws_cloudfront_distribution.s3_distribution.id}"
   }
+
+  depends_on = [
+    terraform_data.update_SDK
+  ]
 }
 
 resource "aws_s3_bucket" "site_www_redirect_bucket" {
@@ -497,8 +505,8 @@ resource "aws_api_gateway_deployment" "dep" {
 resource "terraform_data" "update_SDK" {
   triggers_replace = [
     sha1(jsonencode([
-      aws_api_gateway_rest_api.site_API.id,
-      aws_api_gateway_stage.production_stage.stage_name
+      aws_api_gateway_rest_api.site_API,
+      aws_api_gateway_stage.production_stage
     ]))
   ]
 

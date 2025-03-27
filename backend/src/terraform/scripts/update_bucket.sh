@@ -13,9 +13,11 @@ output_files=("diff_bucket_and_public.txt"
               "invalidations.txt" 
               "batch_invalidations.json")
 
-# rm -fr "${hugo_public_path}"
-# hugo -D -v -s "${hugo_site_path}"
-# echo "public/ updated."
+if [ ${HOME} = "/home/carsten" ]; then
+    rm -fr "${hugo_public_path}"
+    hugo -D -v -s "${hugo_site_path}"
+    echo "public/ updated."
+fi
 
 ls "${hugo_public_path}"
 
