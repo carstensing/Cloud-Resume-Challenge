@@ -10,7 +10,7 @@ permissions:
 jobs:
   run-tests:
     name: Run pytest for Lambda
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest # ubuntu-24.04
     env:
       LAMBDA_TEST_PATH: "backend/test/lambda"
 

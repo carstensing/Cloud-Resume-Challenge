@@ -1,9 +1,11 @@
 #!/usr/bin/bash
 
+git_root=$(git rev-parse --show-toplevel)
+
 rest_api_id=$1
 stage_name=$2
 sdk_dir_name="API_SDK"
-hugo_site_path="../../../frontend/src/hugo_site"
+hugo_site_path="${git_root}/frontend/src/hugo_site"
 sdk_path="${hugo_site_path}/assets/js/${sdk_dir_name}"
 
 # Remove old SDK.

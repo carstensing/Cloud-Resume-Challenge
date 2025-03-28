@@ -1,8 +1,17 @@
 #!/usr/bin/bash
 
-cloudfront_dist="${1}"
+if [ -z "${1+x}" ]; then
+    # no argument
+    cloudfront_dist=$(aws cloudfront list-distributions | jq -r ".DistributionList.Items[0].Id")
+else
+    # argument
+    cloudfront_dist="${1}"
+fi
+
 site_bucket="s3://carsten-singleton.com"
-hugo_site_path="../../../frontend/src/hugo_site"
+git_root=$(git rev-parse --show-toplevel)
+terraform_temp="${git_root}/backend/src/terraform/scripts/temp"
+hugo_site_path="${git_root}/frontend/src/hugo_site"
 hugo_public_path="${hugo_site_path}/public"
 escaped_hugo_public_path=$(echo "${hugo_public_path}" | sed 's|/|\\/|g')  # Escape `/` for Perl.
 bucket_download_dir="bucket_files"
@@ -13,15 +22,16 @@ output_files=("diff_bucket_and_public.txt"
               "invalidations.txt" 
               "batch_invalidations.json")
 
-if [ ${HOME} = "/home/carsten" ]; then
+[ -d "${terraform_temp}" ] || mkdir "${terraform_temp}"
+cd "${terraform_temp}"
+
+if [[ ${GITHUB_ACTION} == true ]]; then
     rm -fr "${hugo_public_path}"
-    hugo -D -v -s "${hugo_site_path}"
+    hugo -D -s "${hugo_site_path}"
     echo "public/ updated."
 fi
 
-ls "${hugo_public_path}"
-
-#             source         destination
+#                source            destination
 aws s3 sync "${site_bucket}" "${bucket_download_dir}" --quiet
 echo "Bucket downloaded."
 
@@ -33,11 +43,13 @@ diff -rq "${bucket_download_dir}" "${hugo_public_path}" > "${output_files[0]}"
 dirs=("${escaped_hugo_public_path}" "${bucket_download_dir}")
 for i in {0..1}
 do
-    perl -nle "print \$2 if /(Only in \Q${dirs[i]}\E: )(.*\..*)/" "${output_files[0]}" > "${output_files[i+1]}"
-
-    perl -nle "print \"\$1\/\$2\" if /Only in (\Q${dirs[i]}\E.*): (?!.*\.\w+$)(.+$)/" "${output_files[0]}" | while read dir; do
-    find "${dir}" -type f
-    done | perl -nle "print \$2 if /(\Q${dirs[i]}\E\/)(.*\..*)/" >> "${output_files[i+1]}"
+    perl -nle "print \"\$3\$2\$4\" if /(Only in \Q${dirs[i]}\E)(\/?)(.*): (.*\..*)/" "${output_files[0]}" > "${output_files[i+1]}"
+    
+    perl -nle "print \"\$1\/\$2\" if /Only in (\Q${dirs[i]}\E.*): (?!.*\.\w+$)(.+$)/" "${output_files[0]}" | \
+    while read dir; do
+        find "${dir}" -type f
+    done \
+    | perl -nle "print \$2 if /(\Q${dirs[i]}\E\/)(.*\..*)/" >> "${output_files[i+1]}"
 done
 
 perl -nle "print \$2 if /(Files \Q${bucket_download_dir}\E\/)([^ ]+)/" "${output_files[0]}" > "${output_files[3]}"
@@ -70,11 +82,6 @@ if [ -s "${output_files[4]}" ]; then
     echo "Files invalidated."
 fi
 
-rm -fr ${bucket_download_dir}
-
-for file in "${output_files[@]}"
-do
-    rm -fr "${file}"
-done
+rm -fr "${terraform_temp}"
 
 echo "Temp files deleted."

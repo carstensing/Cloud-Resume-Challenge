@@ -11,12 +11,13 @@ permissions:
 
 jobs:
   run-terraform:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest # ubuntu-24.04
     env:
         TF_VAR_aws_region: ${{ vars.AWS_REGION }}
         TF_VAR_aws_account_id: ${{ secrets.AWS_ACCOUNT_ID }}
         TF_VAR_tags: ${{ vars.TAGS }}
         TF_VAR_aws_profile: null
+        GITHUB_ACTION: true
 
     defaults:
       run:
@@ -25,8 +26,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-      with:
-        submodules: true  # Fetch Hugo themes (true OR recursive)
+
+    - name: Update git submodule
+      run: git submodule update --remote --merge
 
     - name: Configure AWS Credentials (OIDC)
       uses: aws-actions/configure-aws-credentials@v4
@@ -50,10 +52,6 @@ jobs:
       with:
         hugo-version: "0.123.7"
         extended: true
-
-    - name: Update Hugo Theme
-      run: git submodule update --remote --merge
-      working-directory: ${{ github.workspace }}
 
     - name: Build Hugo
       run: hugo -D
