@@ -10,7 +10,7 @@ fi
 
 site_bucket="s3://carsten-singleton.com"
 git_root=$(git rev-parse --show-toplevel)
-terraform_temp="${git_root}/backend/src/terraform/scripts/temp"
+terraform_temp_path="${git_root}/backend/src/terraform/scripts/temp"
 hugo_site_path="${git_root}/frontend/src/hugo_site"
 hugo_public_path="${hugo_site_path}/public"
 escaped_hugo_public_path=$(echo "${hugo_public_path}" | sed 's|/|\\/|g')  # Escape `/` for Perl.
@@ -22,8 +22,8 @@ output_files=("diff_bucket_and_public.txt"
               "invalidations.txt" 
               "batch_invalidations.json")
 
-[ -d "${terraform_temp}" ] || mkdir "${terraform_temp}"
-cd "${terraform_temp}"
+[ -d "${terraform_temp_path}" ] || mkdir "${terraform_temp_path}"
+cd "${terraform_temp_path}"
 
 if [[ ${GITHUB_ACTION} == true ]]; then
     rm -fr "${hugo_public_path}"
@@ -82,6 +82,6 @@ if [ -s "${output_files[4]}" ]; then
     echo "Files invalidated."
 fi
 
-rm -fr "${terraform_temp}"
+rm -fr "${terraform_temp_path}"
 
 echo "Temp files deleted."

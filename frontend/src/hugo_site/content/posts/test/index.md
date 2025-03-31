@@ -13,4 +13,4 @@ This is a test!
 
 Testing is good for development. I'm testing GitHub Actions and Terraform.
 Getting this to work is tricky. Do I need a profile for local dev? Nope.
-Update. Bash scripts are good for testing.
+Update. Bash scripts are good for testing and scripting.

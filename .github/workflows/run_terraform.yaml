@@ -13,6 +13,7 @@ jobs:
   run-terraform:
     runs-on: ubuntu-latest # ubuntu-24.04
     env:
+        TZ: America/Los_Angeles
         TF_VAR_aws_region: ${{ vars.AWS_REGION }}
         TF_VAR_aws_account_id: ${{ secrets.AWS_ACCOUNT_ID }}
         TF_VAR_tags: ${{ vars.TAGS }}
@@ -26,7 +27,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-
+  
     - name: Update git submodule
       run: git submodule update --remote --merge
 

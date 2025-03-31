@@ -5,8 +5,9 @@
 push.sh
 test.sh
 act/artifacts/
-act_output.txt
-local_output.txt
+**/temp
+hash_site_test.sh
+zip_site.sh
 
 # ------------------------------------------------------------------------------
 # Hugo
