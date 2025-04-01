@@ -1,8 +1,10 @@
 name: Run Terraform
 
 on:
-  push:
-    branches: [ "main", "dev" ]
+  workflow_run:
+    workflows: [ "Lambda Test" ]  # Name of the first workflow
+    types:
+      - completed
   workflow_dispatch: # Allows manual triggering
 
 permissions:
@@ -29,7 +31,7 @@ jobs:
     - uses: actions/checkout@v4
   
     - name: Update git submodule
-      run: git submodule update --remote --merge
+      run: git submodule update --init
 
     - name: Configure AWS Credentials (OIDC)
       uses: aws-actions/configure-aws-credentials@v4

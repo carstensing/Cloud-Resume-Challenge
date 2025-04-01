@@ -23,6 +23,6 @@ zip -rq -X -9 -D "${hugo_zip_path}" . -x "public/*" "themes/*" ".hugo_build.lock
 
 site_hash=$(sha256sum "${hugo_zip_path}" | awk '{print $1}')
 
-echo "{\"hash\": \"${site_hash}\"}"
+echo "{\"site_hash\": \"${site_hash}\"}"
 
 rm -f "${hugo_zip_path}"

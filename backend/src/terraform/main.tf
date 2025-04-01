@@ -282,7 +282,7 @@ data "external" "hugo_site_hash" {
 
 resource "terraform_data" "update_bucket_objects" {
   triggers_replace = [
-    data.external.hugo_site_hash.result.hash,
+    data.external.hugo_site_hash.result.site_hash,
     # Don't hash the bucket if you want to see what exactly is being modified
     # in the Terraform plan stage.
     sha1(jsonencode([
@@ -392,20 +392,18 @@ resource "aws_iam_role_policy_attachment" "attach_policy_to_lambda_role" {
 }
 
 locals {
-  lambda_src_path = "${path.module}/../lambda"
   lambda_name     = "visitor-count"
+  lambda_zip_path = "${path.module}/../lambda/lambda.zip"
 }
 
-data "archive_file" "zip_python_code" {
-  type        = "zip"
-  source_dir  = local.lambda_src_path
-  output_path = "${local.lambda_src_path}/lambda_payload.zip"
+data "external" "lambda_hash" {
+  program = ["./scripts/hash_lambda.sh"]
 }
 
 # Create a lambda function
 resource "aws_lambda_function" "site_lambda_func" {
-  filename         = data.archive_file.zip_python_code.output_path
-  source_code_hash = filebase64sha256(data.archive_file.zip_python_code.output_path)
+  filename         = local.lambda_zip_path
+  source_code_hash = data.external.lambda_hash.result.lambda_hash
   function_name    = local.lambda_name
   role             = aws_iam_role.lambda_role.arn
   handler          = "lambda_function.lambda_handler"
