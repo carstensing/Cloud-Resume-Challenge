@@ -1,6 +1,8 @@
 name: Run Terraform
 
 on:
+  push:
+    branches: [ "main", "dev" ]
   workflow_run:
     workflows: [ "Lambda Test" ]  # Name of the first workflow
     types:
@@ -20,7 +22,6 @@ jobs:
         TF_VAR_aws_account_id: ${{ secrets.AWS_ACCOUNT_ID }}
         TF_VAR_tags: ${{ vars.TAGS }}
         TF_VAR_aws_profile: null
-        GITHUB_ACTION: true
 
     defaults:
       run:
@@ -35,7 +36,7 @@ jobs:
 
     - name: Configure AWS Credentials (OIDC)
       uses: aws-actions/configure-aws-credentials@v4
-      if: ${{ !vars.LOCAL_DEVELOPMENT }}
+      if: ${{ vars.LOCAL_DEVELOPMENT == 'false' }}
       with:
         role-to-assume: "arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHubActionsRole"
         role-session-name: GitHub_to_AWS_via_FederatedOIDC
@@ -43,7 +44,7 @@ jobs:
 
     - name: Configure AWS Credentials (SSO)
       uses: aws-actions/configure-aws-credentials@v4  
-      if: ${{ vars.LOCAL_DEVELOPMENT }}
+      if: ${{ vars.LOCAL_DEVELOPMENT == 'true' }}
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
