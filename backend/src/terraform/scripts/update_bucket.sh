@@ -25,7 +25,9 @@ output_files=("diff_bucket_and_public.txt"
 [ -d "${terraform_temp_path}" ] || mkdir "${terraform_temp_path}"
 cd "${terraform_temp_path}"
 
-if [[ ${GITHUB_ACTION} == true ]]; then
+echo "${LOCAL_DEVELOPMENT}"
+
+if [[ "${LOCAL_DEVELOPMENT}" != false ]]; then
     rm -fr "${hugo_public_path}"
     hugo -D -s "${hugo_site_path}"
     echo "public/ updated."
@@ -82,6 +84,6 @@ if [ -s "${output_files[4]}" ]; then
     echo "Files invalidated."
 fi
 
-rm -fr "${terraform_temp_path}"
+# rm -fr "${terraform_temp_path}"
 
 echo "Temp files deleted."

@@ -3,12 +3,6 @@ variable "aws_region" {
   type        = string
 }
 
-variable "aws_profile" {
-  description = "SSO profile"
-  type        = string
-  sensitive   = true
-}
-
 variable "aws_account_id" {
   description = "AWS account ID"
   type        = string

@@ -19,6 +19,16 @@ provider "aws" {
   region = var.aws_region
 }
 
+# CRC Hugo Post ---------------------------------------------------------------
+
+data "external" "hash_readme" {
+  program = ["./scripts/hash_readme.sh"] # PATH
+}
+
+output "readme_hash" {
+  value = data.external.hash_readme.result.readme_hash
+}
+
 # ACM -------------------------------------------------------------------------
 
 locals {
@@ -276,13 +286,17 @@ resource "aws_s3_bucket_public_access_block" "pab" {
   restrict_public_buckets = false
 }
 
-data "external" "hugo_site_hash" {
-  program = ["./scripts/hash_site.sh"]
+data "external" "hash_hugo_site" {
+  program = ["./scripts/hash_site.sh"] # PATH
+
+  depends_on = [
+    data.external.hash_readme
+  ]
 }
 
 resource "terraform_data" "update_bucket_objects" {
   triggers_replace = [
-    data.external.hugo_site_hash.result.site_hash,
+    data.external.hash_hugo_site.result.site_hash,
     # Don't hash the bucket if you want to see what exactly is being modified
     # in the Terraform plan stage.
     sha1(jsonencode([
@@ -291,7 +305,11 @@ resource "terraform_data" "update_bucket_objects" {
   ]
 
   provisioner "local-exec" {
-    command = "./scripts/update_bucket.sh ${aws_cloudfront_distribution.s3_distribution.id}"
+    # PATH
+    command = join(" ", [
+      "./scripts/update_bucket.sh",
+      aws_cloudfront_distribution.s3_distribution.id
+    ])
   }
 
   depends_on = [
@@ -393,17 +411,17 @@ resource "aws_iam_role_policy_attachment" "attach_policy_to_lambda_role" {
 
 locals {
   lambda_name     = "visitor-count"
-  lambda_zip_path = "${path.module}/../lambda/lambda.zip"
+  lambda_zip_path = "${path.root}/../lambda/lambda.zip" # PATH
 }
 
-data "external" "lambda_hash" {
-  program = ["./scripts/hash_lambda.sh"]
+data "external" "hash_lambda" {
+  program = ["./scripts/hash_lambda.sh"] # PATH
 }
 
 # Create a lambda function
 resource "aws_lambda_function" "site_lambda_func" {
   filename         = local.lambda_zip_path
-  source_code_hash = data.external.lambda_hash.result.lambda_hash
+  source_code_hash = data.external.hash_lambda.result.lambda_hash
   function_name    = local.lambda_name
   role             = aws_iam_role.lambda_role.arn
   handler          = "lambda_function.lambda_handler"
@@ -509,7 +527,12 @@ resource "terraform_data" "update_SDK" {
   ]
 
   provisioner "local-exec" {
-    command = "./scripts/generate_sdk.sh ${aws_api_gateway_rest_api.site_API.id} ${aws_api_gateway_stage.production_stage.stage_name}"
+    # PATH
+    command = join(" ", [
+      "./scripts/generate_sdk.sh",
+      aws_api_gateway_rest_api.site_API.id,
+      aws_api_gateway_stage.production_stage.stage_name
+    ])
   }
 }
 

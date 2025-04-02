@@ -12,5 +12,4 @@ account_id=$(aws sts get-caller-identity | jq ".Account")
 
 cat <<EOF > "${git_root}/backend/src/terraform/.secrets.auto.tfvars"
 aws_account_id = ${account_id}
-aws_profile    = "insert_profile_name_here"
 EOF
