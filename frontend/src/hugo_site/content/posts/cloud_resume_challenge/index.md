@@ -1,6 +1,7 @@
 +++
 date = "2024-10-17T14:55:59-07:00"
 draft = true
+lastmod = "2025-04-02"
 title = "Cloud Resume Challenge [Draft]"
 summary = """A work in progress."""
 +++
@@ -387,8 +388,6 @@ To autorun tests:
       gnome-terminal -- bash -c "ptw --ext=.py,.json"
     If your terminal is different, change "gnome-terminal"
 
-TODO
-
 ```ini
 # pytest.ini
 
@@ -433,7 +432,11 @@ files.
 
 ### 9. Source Control
 
-Git and GitHub
+Git and GitHub plus GitHub Projects. SOMUCHTODO
+
+### 10. CI/CD
+
+GitHub Actions. SOMUCHTODO
 
 ## Technology Used
 

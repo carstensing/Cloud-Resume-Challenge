@@ -8,6 +8,7 @@ act/artifacts/
 **/temp
 hash_site_test.sh
 zip_site.sh
+push_generated_files.sh
 
 # ------------------------------------------------------------------------------
 # Hugo

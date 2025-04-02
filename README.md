@@ -24,8 +24,6 @@ the way.
 
 ## Contents <!-- omit from toc -->
 
-## Introduction
-
 - [Introduction](#introduction)
     - [Why Learn Cloud](#why-learn-cloud)
     - [What is the Cloud Resume Challenge](#what-is-the-cloud-resume-challenge)
@@ -49,6 +47,8 @@ the way.
     - [8. Terraform](#8-terraform)
     - [9. Source Control](#9-source-control)
 - [Technology Used](#technology-used)
+
+## Introduction
 
 ### Why Learn Cloud
 
@@ -452,7 +452,11 @@ files.
 
 ### 9. Source Control
 
-Git and GitHub
+Git and GitHub plus GitHub Projects. SOMUCHTODO
+
+### 10. CI/CD
+
+GitHub Actions. SOMUCHTODO
 
 ## Technology Used
 
