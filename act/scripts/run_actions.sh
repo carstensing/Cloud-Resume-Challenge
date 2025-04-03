@@ -4,7 +4,7 @@ git_root=$(git rev-parse --show-toplevel)
 
 cd "${git_root}"
 
-act push -q \
+act push \
 --action-offline-mode \
 -P ubuntu-latest=my-act-aws-image \
 -W "${git_root}/.github/workflows/run_terraform.yaml" \

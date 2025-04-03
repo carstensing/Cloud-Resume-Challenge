@@ -1,14 +1,12 @@
 name: Run Terraform
 
 on:
-  workflow_run:
-    workflows: [ "Lambda Test" ]  # Name of the first workflow
-    types:
-      - completed
+  push:
+    branches: [ "main", "dev" ]
   workflow_dispatch: # Allows manual triggering
 
 permissions:
-  contents: read # Required for actions/checkout
+  contents: write # Required for actions/checkout
   id-token: write # Required to request JSON Web Token for OIDC
 
 jobs:
@@ -28,6 +26,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+
+    - name: Get branch.
+      id: branch-names
+      uses: tj-actions/branch-names@v8
   
     - name: Update git submodule
       run: git submodule update --init
@@ -78,4 +80,5 @@ jobs:
 
     - name: Push generated files
       run: |
-       ./scripts/push_generated_files.sh
+       ./scripts/push_generated_files.sh \
+       ${{ steps.branch-names.outputs.ref_branch }}
