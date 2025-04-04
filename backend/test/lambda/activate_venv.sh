@@ -1,1 +1,0 @@
-source lambda-env/bin/activate
