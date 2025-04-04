@@ -419,7 +419,7 @@ data "archive_file" "lambda_zip" {
   type        = "zip"
   source_dir  = local.lambda_src_path
   output_path = local.lambda_zip_path
-  excludes    = ["${local.lambda_zip_path}", "__pycache__"]
+  excludes    = ["lambda.zip", "__pycache__"]
 }
 
 # Create a lambda function
