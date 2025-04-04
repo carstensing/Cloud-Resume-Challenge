@@ -8,21 +8,19 @@
 # configuration. This JSON object must again have all of its values as strings.
 
 git_root=$(git rev-parse --show-toplevel)
-temp_path="/tmp"
+temp_path="${git_root}/backend/src/terraform/scripts/temp"
 
 hugo_site_path="${git_root}/frontend/src/hugo_site"
-hugo_zip="hugo_site.zip"
-hugo_zip_path="${temp_path}/${hugo_zip}"
 
 # Must cd to src dir.
 cd "${hugo_site_path}"
 
-#       save destination         src dir
-zip -rq -X -9 -D "${hugo_zip_path}" . -x "public/*" "themes/*" ".hugo_build.lock" \
-"terraform.tfstate"
+# "public/*" "themes/*" "resources/*" ".hugo_build.lock" "terraform.tfstate"
 
-site_hash=$(sha256sum "${hugo_zip_path}" | awk '{print $1}')
+site_hash=$(find . \( -path "public/*" -o -path "themes/*" -o -path "resources/*" \) \
+-prune -o \( -not -name ".hugo_build.lock" -and -not -name "terraform.tfstate" \) \
+-type f -exec sha256sum {} + | LC_ALL=C sort | sha256sum)
+
+site_hash="${site_hash:0:${#site_hash}-3}" 
 
 echo "{\"site_hash\": \"${site_hash}\"}"
-
-rm -f "${hugo_zip_path}"

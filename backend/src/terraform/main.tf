@@ -411,17 +411,20 @@ resource "aws_iam_role_policy_attachment" "attach_policy_to_lambda_role" {
 
 locals {
   lambda_name     = "visitor-count"
+  lambda_src_path = "${path.root}/../lambda"            # PATH
   lambda_zip_path = "${path.root}/../lambda/lambda.zip" # PATH
 }
 
-data "external" "hash_lambda" {
-  program = ["./scripts/hash_lambda.sh"] # PATH
+data "archive_file" "lambda_zip" {
+  type        = "zip"
+  source_dir  = local.lambda_src_path
+  output_path = local.lambda_zip_path
 }
 
 # Create a lambda function
 resource "aws_lambda_function" "site_lambda_func" {
   filename         = local.lambda_zip_path
-  source_code_hash = data.external.hash_lambda.result.lambda_hash
+  source_code_hash = data.archive_file.lambda_zip.output_sha
   function_name    = local.lambda_name
   role             = aws_iam_role.lambda_role.arn
   handler          = "lambda_function.lambda_handler"

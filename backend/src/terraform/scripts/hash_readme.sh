@@ -13,6 +13,10 @@ readme="${git_root}/README.md"
 
 readme_hash=$(sha256sum "${readme}" | awk '{print $1}')
 
+echo "{\"readme_hash\": \"${readme_hash}\"}"
+
+# Update post.
+
 cd "${terraform_path}"
 
 old_readme_hash=$(terraform output -raw readme_hash)
@@ -21,5 +25,3 @@ if [[ "${readme_hash}" != "${old_readme_hash}" ]]; then
     # echo "updating"
     python3 scripts/post_updater.py
 fi
-
-echo "{\"readme_hash\": \"${readme_hash}\"}"

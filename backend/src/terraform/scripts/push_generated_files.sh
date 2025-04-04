@@ -11,7 +11,7 @@ if [ -n "${git_changes}" ]; then
     git config --global user.email "carstensing@users.noreply.github.com"
     git add .
     git status
-    git commit -m "Generated during GitHub Action."
+    git commit -m "Generated files during GitHub Action."
     git push origin "${1}"
 else
     # no changes

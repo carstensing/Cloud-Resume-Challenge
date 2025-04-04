@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   run-terraform:
-    runs-on: ubuntu-latest # ubuntu-24.04
+    runs-on: ubuntu-24.04
     env:
         TZ: America/Los_Angeles
         TF_VAR_aws_region: ${{ vars.AWS_REGION }}
@@ -79,6 +79,7 @@ jobs:
       run: terraform apply -auto-approve
 
     - name: Push generated files
+      if: ${{ vars.LOCAL_DEVELOPMENT == 'false' }}
       run: |
        ./scripts/push_generated_files.sh \
        ${{ steps.branch-names.outputs.ref_branch }}
