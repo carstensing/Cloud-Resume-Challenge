@@ -8,7 +8,6 @@
 # configuration. This JSON object must again have all of its values as strings.
 
 git_root=$(git rev-parse --show-toplevel)
-temp_path="${git_root}/backend/src/terraform/scripts/temp"
 
 hugo_site_path="${git_root}/frontend/src/hugo_site"
 
@@ -17,9 +16,10 @@ cd "${hugo_site_path}"
 
 # "public/*" "themes/*" "resources/*" ".hugo_build.lock" "terraform.tfstate"
 
-site_hash=$(find . \( -path "public/*" -o -path "themes/*" -o -path "resources/*" \) \
--prune -o \( -not -name ".hugo_build.lock" -and -not -name "terraform.tfstate" \) \
--type f -exec sha256sum {} + | LC_ALL=C sort | sha256sum)
+site_hash=$(find . \
+  \( -path "./public/*" -o -path "./themes/*" -o -path "./resources/*" \) -prune -o \
+  -type f \( ! -name ".hugo_build.lock" -a ! -name "terraform.tfstate" \) \
+  -exec sha256sum {} + | LC_ALL=C sort | sha256sum)
 
 site_hash="${site_hash:0:${#site_hash}-3}" 
 

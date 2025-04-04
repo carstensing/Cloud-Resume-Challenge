@@ -415,17 +415,24 @@ locals {
   lambda_zip_path = "${path.root}/../lambda/lambda.zip" # PATH
 }
 
-data "archive_file" "lambda_zip" {
-  type        = "zip"
-  source_dir  = local.lambda_src_path
-  output_path = local.lambda_zip_path
-  excludes    = ["lambda.zip", "__pycache__"]
+data "external" "hash_lambda" {
+  program = ["./scripts/hash_lambda.sh"] # PATH
+}
+
+resource "terraform_data" "zip_lambda" {
+  triggers_replace = [
+    data.external.hash_lambda.result.lambda_hash
+  ]
+
+  provisioner "local-exec" {
+    command = "./scripts/zip_lambda.sh" # PATH
+  }
 }
 
 # Create a lambda function
 resource "aws_lambda_function" "site_lambda_func" {
   filename         = local.lambda_zip_path
-  source_code_hash = data.archive_file.lambda_zip.output_sha
+  source_code_hash = data.external.hash_lambda.result.lambda_hash
   function_name    = local.lambda_name
   role             = aws_iam_role.lambda_role.arn
   handler          = "lambda_function.lambda_handler"
