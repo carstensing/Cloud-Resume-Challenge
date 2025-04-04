@@ -2,12 +2,9 @@
 # Files created by dev
 # ------------------------------------------------------------------------------
 **/*.secrets
-push.sh
-test.sh
 act/artifacts/
 **/temp
-hash_site_test.sh
-zip_site.sh
+push.sh
 
 # ------------------------------------------------------------------------------
 # Hugo

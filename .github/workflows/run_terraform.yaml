@@ -3,19 +3,15 @@ name: Run Terraform
 on:
   push:
     branches: [ "main", "dev" ]
-  workflow_run:
-    workflows: [ "Lambda Test" ]  # Name of the first workflow
-    types:
-      - completed
   workflow_dispatch: # Allows manual triggering
 
 permissions:
-  contents: read # Required for actions/checkout
+  contents: write # Required for actions/checkout
   id-token: write # Required to request JSON Web Token for OIDC
 
 jobs:
   run-terraform:
-    runs-on: ubuntu-latest # ubuntu-24.04
+    runs-on: ubuntu-24.04
     env:
         TZ: America/Los_Angeles
         TF_VAR_aws_region: ${{ vars.AWS_REGION }}
@@ -30,6 +26,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+
+    - name: Get branch.
+      id: branch-names
+      uses: tj-actions/branch-names@v8
   
     - name: Update git submodule
       run: git submodule update --init
@@ -77,3 +77,9 @@ jobs:
 
     - name: Apply Terraform changes
       run: terraform apply -auto-approve
+
+    - name: Push generated files
+      if: ${{ vars.LOCAL_DEVELOPMENT == 'false' }}
+      run: |
+       ./scripts/push_generated_files.sh \
+       ${{ steps.branch-names.outputs.ref_branch }}

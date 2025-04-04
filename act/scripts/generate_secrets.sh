@@ -24,3 +24,5 @@ AWS_SECRET_ACCESS_KEY=${secret_access_key}
 SESSION_TOKEN=${session_token}
 AWS_ACCOUNT_ID=${account_id}
 EOF
+
+echo "Secrets generated."
