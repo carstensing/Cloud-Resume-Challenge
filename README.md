@@ -2,24 +2,21 @@
 
 <!-- badges -->
 
+[![Run Terraform](https://github.com/carstensing/Cloud-Resume-Challenge/actions/workflows/run_terraform.yaml/badge.svg)](https://github.com/carstensing/Cloud-Resume-Challenge/actions/workflows/run_terraform.yaml)
 [![Lambda Test](https://github.com/carstensing/Cloud-Resume-Challenge/actions/workflows/lambda_test.yaml/badge.svg)](https://github.com/carstensing/Cloud-Resume-Challenge/actions/workflows/lambda_test.yaml)
 
-The [**Cloud Resume Challenge**][cloud_resume_challenge] is a multi-step
-project designed to help aspiring cloud developers gain real-world experience
-with cloud technologies by building and deploying a **personal resume
-website**.
+The [Cloud Resume Challenge] is a multi-step project designed to help
+aspiring cloud developers gain real-world experience with cloud technologies by
+building and deploying a **personal resume website**.
 
 This repo showcases my journey through the challenge and what I learned along
 the way.
 
-**Check out my website at [carsten-singleton.com][my-website].**
+**Check out my website at [carsten-singleton.com].**
 
-<!-- reference links -->
+[carsten-singleton.com]: https://carsten-singleton.com
 
-[my-website]:
-    https://carsten-singleton.com
-
-[cloud_resume_challenge]:
+[Cloud Resume Challenge]:
     https://forrestbrazeal.com/2020/04/23/the-cloud-resume-challenge/
 
 ## Contents <!-- omit from toc -->
@@ -27,6 +24,8 @@ the way.
 - [Introduction](#introduction)
     - [Why Learn Cloud](#why-learn-cloud)
     - [What is the Cloud Resume Challenge](#what-is-the-cloud-resume-challenge)
+        - [Outline](#outline)
+        - [Site Diagram](#site-diagram)
 - [Steps I Took](#steps-i-took)
     - [1. AWS Certification](#1-aws-certification)
     - [2. Hugo Static Site](#2-hugo-static-site)
@@ -36,17 +35,28 @@ the way.
         - [Free Tier](#free-tier)
         - [SSO Login](#sso-login)
     - [4. S3, Route53 and Cloudfront](#4-s3-route53-and-cloudfront)
-        - [Route 53 Name Server Issue](#route-53-name-server-issue)
+        - [Name Servers](#name-servers)
         - [CloudFront Cache Update](#cloudfront-cache-update)
-            - [Invalidations](#invalidations)
+            - [File Expiration](#file-expiration)
             - [Versioned File Names](#versioned-file-names)
+            - [Invalidations](#invalidations)
     - [5. AWS CLI](#5-aws-cli)
         - [SSO for CLI](#sso-for-cli)
     - [6. DynamoDB, Lambda, API Gateway and JavaScript](#6-dynamodb-lambda-api-gateway-and-javascript)
+        - [Lambda](#lambda)
+        - [API Gateway](#api-gateway)
+        - [DynamoDB](#dynamodb)
+        - [JavaScript](#javascript)
     - [7. pytests](#7-pytests)
+        - [Fixtures and Parameterization](#fixtures-and-parameterization)
+        - [Python Virtual Environment](#python-virtual-environment)
     - [8. Terraform](#8-terraform)
+        - [Reliable Change Detection for External Files](#reliable-change-detection-for-external-files)
+        - [Remote State](#remote-state)
+        - [Resource Tips](#resource-tips)
     - [9. Source Control](#9-source-control)
-- [Technology Used](#technology-used)
+    - [10. CI/CD with GitHub Actions](#10-cicd-with-github-actions)
+- [Conclusion](#conclusion)
 
 ## Introduction
 
@@ -55,8 +65,8 @@ the way.
 The entry-level job market for roles in software development and IT operations
 are oversaturated and highly competitive. Traditional education often lacks
 cloud-specific training, resulting in a shortage of skilled engineers. As more
-companies depend on cloud services for critical business operations, the
-demand for jobs outweighs the supply of trained engineers.
+companies depend on cloud services for critical business operations, the demand
+for jobs outweighs the supply of trained engineers.
 
 Fortunately, cloud engineering is accessible to those without a degree, thanks
 to numerous certifications and online learning resources. Engineers gain
@@ -70,18 +80,24 @@ goal of becoming a DevOps Engineer.
 
 ### What is the Cloud Resume Challenge
 
-The [**Cloud Resume Challenge**][cloud_resume_challenge], by [Forrest
-Brazeal][forrest_brazeal], is a project outline that simulates end-to-end cloud
-development—culminating in a personal resume website. The challenge provides
-hands-on experience with cloud technologies and serves as a portfolio piece for
-job seekers in the field. Any cloud service provider can be used to complete
-this challenge. I chose [Amazon Web Services][aws].
+The [Cloud Resume Challenge], by [Forrest Brazeal], is a project outline
+that simulates end-to-end cloud development—culminating in a personal resume
+website. The challenge provides hands-on experience with cloud technologies and
+serves as a portfolio piece for job seekers in the field. Any cloud service
+provider can be used to complete this challenge. I chose [Amazon Web
+Services].
 
-Forrest also sells a [project guide][cloud_resume_challenge_book] that details
-the best ways to go about the challenge and includes additional modifications
-for even more hand-on practice. I found it to be incredibly helpful.
+[Forrest Brazeal]: https://forrestbrazeal.com/
 
-General outline:
+[Amazon Web Services]: https://aws.amazon.com/what-is-aws/
+
+Forrest also sells a [project guide] that details the best ways to go about
+the challenge and includes additional modifications for even more hand-on
+practice. I found it to be incredibly helpful.
+
+[project guide]: https://cloudresumechallenge.dev/book/
+
+#### Outline
 
 - **Certification**: Obtain a cloud certification (AWS Certified Cloud
   Practitioner).
@@ -94,55 +110,48 @@ General outline:
 
 - **Infrastructure as Code (IaC)**: Automate deployments with Terraform.
 
-- **CI/CD**: Set up automated testing (pytest and PlayWright) and deployment
+- **CI/CD**: Setup automated testing (pytest and PlayWright) and deployment
   pipelines (GitHub Actions).
 
-<!-- reference links -->
+#### Site Diagram
 
-[forrest_brazeal]:
-    https://forrestbrazeal.com/
+![Site Diagram]
 
-[aws]:
-    https://aws.amazon.com/what-is-aws/
-
-[cloud_resume_challenge_book]:
-    https://cloudresumechallenge.dev/book/
+[Site Diagram]: ./images/site_diagram.svg
 
 ## Steps I Took
 
 ### 1. AWS Certification
 
-Without any prior cloud experience the project guide was difficult to
-understand. As I studied for the [AWS Certified Cloud
-Practitioner][certified_cloud_practitioner] exam, I learned about vital cloud
-concepts and the specific services used in the project.
+The project guide recommends taking the exam prior to starting the project to
+set a knowledge baseline. I read through the later sections and found all of
+the AWS jargon to be intimidating and impossible to understand. So, I studied
+for the [AWS Certified Cloud Practitioner] exam.
+
+[AWS Certified Cloud Practitioner]:
+    https://aws.amazon.com/certification/certified-cloud-practitioner/
 
 I spent over 60 hours watching lectures, reading, and answering over 1900
 practice problems. **Make sure your study material is up to date** with the
-current exam version and outline. I studied old material which set
-me back some time.
+current exam version and outline. I studied old material which set me back some
+time. I watched [Andrew Brown's lecture videos] and studied practice
+questions.
 
-After completing this project, I intend on obtaining the [AWS Certified
-Solutions Architect][certified_solutions_architect] certification as well.
-
-Free resources that I used to pass the exam (Oct 2024):
-
-- [Andrew Brown's lecture videos][lecture]
-- [Sthithapragna's practice questions][questions]
-
-<!-- reference links -->
-
-[certified_cloud_practitioner]:
-    https://aws.amazon.com/certification/certified-cloud-practitioner/
-
-[certified_solutions_architect]:
-    https://aws.amazon.com/certification/certified-solutions-architect-professional/
-
-[lecture]:
+[Andrew Brown's lecture videos]:
     https://www.youtube.com/watch?v=NhDYbskXRgc&list=LL&index=11
 
-[questions]:
-    https://www.youtube.com/playlist?list=PL7GozF-qZ4KeQftuqU3yxvQ-f3eFNUiuJ
+However, **I'd recommend doing the exam after the project** since the hands-on
+learning is so much more effective and unified. The project may be more
+difficult to digest in the beginning, but the process of trial-and-error is
+what really solidifies information. Also, without any experience with how
+services are connected, studying for the exam is straight memorization which
+isn't very useful.
+
+After completing this project, I intend to obtain the [AWS Certified
+Solutions Architect] certification.
+
+[AWS Certified Solutions Architect]:
+    https://aws.amazon.com/certification/certified-solutions-architect-professional/
 
 ### 2. Hugo Static Site
 
@@ -156,8 +165,13 @@ HTML and CSS static site that I would dread updating.
 
 Free Resources to learn Hugo:
 
-- [Hugo documentation][hugo]
-- [Giraffe Academy][giraffe_academy]
+- [Hugo documentation]
+- [Giraffe Academy]
+
+[Hugo documentation]: https://gohugo.io/documentation/
+
+[Giraffe Academy]:
+    https://youtube.com/playlist?list=PLLAZ4kZ9dFpOnyRlyS-liKL5ReHDcj4G3&feature=shared
 
 ### 3. AWS Organizations
 
@@ -165,16 +179,17 @@ AWS Organizations is a centralized account management service that helps
 businesses manage multiple AWS accounts efficiently. It provides security,
 governance, cost optimization, and automation at scale.
 
-- [What is AWS Organizations?][what_is_aws_organizations]
-- [Terminology and concepts for AWS Organizations][terminology_and_concepts_for_aws_organizations]
+- [What is an AWS Organization?]
+- [Terminology and concepts for AWS Organizations]
 
-[what_is_aws_organizations]:
+[What is an AWS Organization?]:
     https://docs.aws.amazon.com/organizations/latest/userguide/orgs_introduction.html
-[terminology_and_concepts_for_aws_organizations]:
+
+[Terminology and concepts for AWS Organizations]:
     https://docs.aws.amazon.com/organizations/latest/userguide/orgs_getting-started_concepts.html
 
-Okay great, but why did I use it for a single-person project? Besides to get
-some hands-on experience, here is what I found:
+Other than gaining hands-on experience, why use AWS for a single-person
+project?
 
 #### Account Protection
 
@@ -182,15 +197,21 @@ Using the AWS root account for development is a bad practice due to its
 unlimited privileges, making it prone to accidental misconfigurations or
 deletions that cannot be restricted by IAM policies. It also poses a
 significant security risk since a compromised root account grants full control
-over all AWS resources. This can cost **thousands** of dollars! So to protect
-yourself from yourself and attackers, develop in a member account, not root.
+over all AWS resources. This can cost **thousands** of dollars! So protect you
+wallet from yourself and attackers by developing in a member account.
 
 #### IAM Roles and Policies
 
 Member accounts have their permissions set by root. I gave my dev account
-PowerUserAccess, which grants full access to AWS services and resources, but
-does not allow management of Users and groups. Sounds like that should be all I
-need to code some stuff right? Nope! Thanks to IAM roles and policies.
+[PowerUserAccess], which grants full access to most AWS services and
+resources except IAM. Sounds like that should be all I need to code some stuff
+right? Nope! Because services often interact with each other and need IAM
+permissions to do so. For example, by default, Lambda will create an execution
+role with permissions to upload logs to Amazon CloudWatch Logs. So I couldn't
+even create a Lambda function without IAM permissions.
+
+[PowerUserAccess]:
+    https://docs.aws.amazon.com/aws-managed-policy/latest/reference/PowerUserAccess.html
 
 **Roles** are like logos that are assigned to users, groups, or services,
 representing their identity and the level of access they have. **Policies** are
@@ -222,18 +243,16 @@ The hack to creating member accounts is to use email sub-addressing instead of
 creating a new email. For example, if the root email is <myemail@mail.com>, the
 dev account can be created with <myemail+dev@mail.com>. Even if the root account
 is no longer eligible for the Free Tier, the member accounts are eligible
-because they are newly created. After a year, when the dev account loses Free
-Tier eligibility, simply create another dev account with a different
-sub-address. Infinite Free Tier!
+because they are newly created. After a year, when the account loses Free
+Tier eligibility, create another account in the org to get infinite Free Tier!
 
 Be aware that even with multiple Free Tier accounts within an organization, the
 benefits don't increase. As long as one or more accounts are Free Tier
 eligible, the entire organization will _share_ the standard Free Tier benefits.
 
-- [AWS Free Tier FAQs][aws_free_tier_faqs]
+- [AWS Free Tier FAQs]
 
-[aws_free_tier_faqs]:
-    https://aws.amazon.com/free/free-tier-faqs/
+[AWS Free Tier FAQs]: https://aws.amazon.com/free/free-tier-faqs/
 
 #### SSO Login
 
@@ -245,86 +264,104 @@ single sign-on (SSO) access with credentials that expire. These temporary
 credentials reduce the risk of leaked keys compromising an account. Plus, sso
 login is very convenient to use, even from the CLI.
 
-- [SSO setup guide for personal development][sso_for_personal_development]
+- [SSO setup guide for personal development] (AWS SSO is now AWS IAM Identity
+  Center)
 
-To avoid frequent logins, set the session duration to more than an hour.
-
-<!-- reference links -->
-
-[sso_for_personal_development]:
+[SSO setup guide for personal development]:
     https://dev.to/aws-builders/minimal-aws-sso-setup-for-personal-aws-development-220k
+
+> [!TIP]
+> To avoid frequent logins, set the session duration to more than an hour.
 
 ### 4. S3, Route53 and Cloudfront
 
 I purchased a domain name through Route 53 and created an S3 bucket to store my
 site files built by Hugo. After that, I used CloudFront to enable HTTPS and
-content delivery. AWS has guides on how to do all of this, which made it
-very easy.
+content delivery. AWS has guides on how to do all of this, but it can still be
+tricky. Follow them in this order:
 
-Learning Resources:
+- [Configuring a static site using a custom domain registered with Route 53]
+- [Requesting a public certificate with ACM for HTTPS] (step 2 only)
+- [Configuring CloudFront]
 
-- [Configuring a static site using a custom domain registered with Route 53][s3_static_site_custom_domain]
-- [CloudFront and HTTPS][s3_static_site_cloudfront_and_https]
-
-<!-- reference links -->
-
-[s3_static_site_custom_domain]:
+[Configuring a static site using a custom domain registered with Route 53]:
     https://docs.aws.amazon.com/AmazonS3/latest/userguide/website-hosting-custom-domain-walkthrough.html
 
-[s3_static_site_cloudfront_and_https]:
+[Requesting a public certificate with ACM for HTTPS]:
+    https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/getting-started-cloudfront-overview.html#getting-started-cloudfront-request-certificate
+
+[Configuring CloudFront]:
     https://docs.aws.amazon.com/AmazonS3/latest/userguide/website-hosting-cloudfront-walkthrough.html
 
-Some things weren't so obvious and required some investigation / trial and
-error. Here is what I learned:
+Some things weren't so obvious and required some investigation with some trial
+and error. Here is what I learned:
 
-#### Route 53 Name Server Issue
+#### Name Servers
 
-For DNS to work properly, the record for routing traffic to your domain name
-must use the same name servers that the hosted zone uses. I recreated the
-hosted zone and record multiple times while following the guide and was
-auto-generated differing values, which made DNS not work.
+For DNS to work properly, the name servers connected to the registered domain
+in Route 53 must match the same name servers in the hosted zone. The hosted
+zone's name servers cannot be set manually, so you'll have to update the
+registered domain.
 
 #### CloudFront Cache Update
 
-CloudFront caches S3 files for the static site, and any updates must be
-reflected in the cache. The expiration time for cached files be configured,
-with different lengths of time offering different pros and cons. Read their
-[cache expiration guide][cloudfront_cache_expiration] for more details.
+CloudFront caches S3 files for the static site so any S3 updates must be
+reflected in the cache. Your domain won't serve the updated files until they
+are cycled out, which can happen three ways: files expire within a set time,
+versioned files have been updated with a new version, or files are manually
+invalidated.
 
-So, even after updating S3, your domain won't serve the updated files until they
-are cycled out. To avoid waiting for files to expire, they can be manually
-invalidated or automatically updated if versioned file names are used.
+##### File Expiration
 
-<!-- reference links -->
+The expiration time for cached files can be configured, with different lengths
+of time offering different pros and cons. Read the [cache expiration guide]
+for more details. However, when I updated my site I want to see changes
+immediately, making this not the solution.
 
-[cloudfront_cache_expiration]:
+[cache expiration guide]:
     https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Expiration.html
-
-##### Invalidations
-
-Transferring new files to the cache incurs costs for both methods, and
-invalidations have an additional [cost after 1,000 submissions][invalidation_cost]. So, it's worth it to be smart about invalidation. Each deleted or modified file must be explicitly listed in the invalidation with its full bucket path.
-Getting these file paths takes some work but isn't too hard.
-
-<!-- reference links -->
-
-[invalidation_cost]:
-    https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/PayingForInvalidation.html
 
 ##### Versioned File Names
 
-[AWS recommends versioned file names][invalidate_vs_versioned_files], but the
-implementation requires more work since the files names have to be managed.
-[This is a great post][cloudfront_hashed_file_names] about how to
-use hashed file names to update the cache.
+AWS will automatically update files or directories with a changed version
+identifier. This requires renaming each file to be updated and updating all
+corresponding references within other files. Using hashes instead of
+incremental version numbers might simplify the process. However, changing file
+references within files screams terrible bugs to me so I decided not to use
+versioning. Additionally, any deleted files still require invalidation.
 
-<!-- reference links -->
+Here is some more details on versioning:
 
-[invalidate_vs_versioned_files]:
+- [Invalidation vs versioning]
+- [Use versioning to update content]
+- [Example on how to effectively use versioning]
+
+[Invalidation vs Versioning]:
     https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Invalidation.html#Invalidation_Expiration
 
-[cloudfront_hashed_file_names]:
+[Use versioning to update content]:
+    https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/UpdatingExistingObjects.html#ReplacingObjects
+
+[Example on how to effectively use versioning]:
     https://stackoverflow.com/questions/72468436/how-best-to-serve-versioned-s3-files-from-cloudfront
+
+##### Invalidations
+
+Manual cache clearing is done through file invalidations. While data transfer
+from an AWS origin such as S3 to CloudFront is free, invalidations incur
+additional [cost after 1,000 submissions]. Although exceeding 1,000
+invalidation requests per month is unlikely, especially after completing the
+project.
+
+[cost after 1,000 submissions]:
+    https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/PayingForInvalidation.html
+
+Each deleted or modified file must be explicitly listed in the invalidation
+request with its full bucket path. The entire cache can be invalidated easily,
+or specific file paths can be copied and pasted for targeted invalidation,
+making small updates and testing straightforward. Generating invalidations
+automatically took some bash scripting with regular expressions but wan't too
+complicated overall.
 
 ### 5. AWS CLI
 
@@ -334,25 +371,29 @@ efficient. It's also a fantastic learning tool for backwards engineering
 because the console often does more than one action at a time. I learned this
 after I redid part 4 only using the CLI.
 
-- [CLI install guide][cli_install_guide]
-- [CLI command completion][cli_command_completion]
-- [CLI command reference][cli_doc]
+- [CLI install guide]
+- [CLI auto complete]
+- [CLI command reference]
 
-[cli_install_guide]:
+[CLI install guide]:
     https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
 
-[cli_command_completion]:
+[CLI auto complete]:
     https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-completion.html
 
-[cli_doc]:
+[CLI command reference]:
     https://awscli.amazonaws.com/v2/documentation/api/latest/reference/index.html
 
 #### SSO for CLI
 
-Some configuration is required to use SSO with the AWS CLI. I prefer editing the
-`~/.aws/config` file directly instead of using their setup wizard. Follow the user guide:
+Some configuration is required to use SSO with the AWS CLI. I prefer editing
+the `~/.aws/config` file directly instead of using their setup wizard. Follow
+the user guide:
 
-- [SSO config for CLI][sso_config_for_cli]
+- [SSOconfig for CLI][SSO_config_for_CLI]
+
+[SSO_config_for_CLI]:
+    https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-sso.html#cli-configure-sso-manual
 
 To login:
 
@@ -360,53 +401,192 @@ To login:
 aws sso login --profile my-profile
 ```
 
-Automatically loading a profile requires exporting it to your shell startup
-script:
+Setting the default profile automatically requires exporting it to your shell
+startup script:
 
 ```bash
 echo "export AWS_PROFILE=my-profile" >> ~/.bashrc
 source ~/.bashrc
 ```
 
-For safety, it's better to leave `AWS_PROFILE` unset when using multiple
+For safety, it's better to leave `AWS_PROFILE` unset when using _multiple_
 profiles, to ensure actions are performed with the correct profile.
 
-<!-- reference links -->
-
-[sso_config_for_cli]:
-    https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-sso.html#cli-configure-sso-manual
+> [!IMPORTANT]
+> Without a default set, each command has to end with `--profile my-profile`.
 
 ### 6. DynamoDB, Lambda, API Gateway and JavaScript
 
-I learned a **ton** on this chuck of the project. I understood the concept of
+I learned a **ton** on this portion of the project. I understood the concept of
 how a website, a database and an API interacted, but actually building it all
-really challenged me. Again, since I didn't have any experience with these
-services, I started with the AWS console.
+really challenged me.
 
-I broke everything down into the smallest steps I could and then pieced them
-together to slowly. I took these steps:
+API Gateway generates JavaScript used by Hugo to perform REST API requests.
+When a request is made, API Gateway forwards the relevant information to Lambda
+for processing. Lambda can interact with services like DynamoDB or perform
+other tasks, then return a response to API Gateway, which sends the final
+result back to Hugo.
 
-1. Read and write to DynamoDB from Lambda TODO
+#### Lambda
 
-<https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/programming-with-python.html>
+Lambda receives an event object whose format depends on the service that's
+invoking it. Testing a Lambda is as simple as passing in a mock event object.
+Lambda can also interact with other services through libraries.
+
+- [How to use the Lambda console]
+- [Learn about the Lambda handler]
+- [Lambda context object]
+
+[How to use the Lambda console]:
+    https://docs.aws.amazon.com/lambda/latest/dg/getting-started.html
+
+[Learn about the Lambda handler]:
+    https://docs.aws.amazon.com/lambda/latest/dg/python-handler.html
+
+[Lambda context object]:
+    https://docs.aws.amazon.com/lambda/latest/dg/python-context.html
+
+#### API Gateway
+
+Prior to this project, I had no experience working with APIs, so the tutorials
+listed below were extremely helpful in introducing the core concepts. I gained
+hands-on practice with different HTTP methods and responses, as well as path
+parameters, query strings, headers, and CORS.
+
+One aspect that took a bit longer to fully understand was how the event JSON
+sent to Lambda is configured through the mapping template during the
+integration request stage. This is important for getting information related to
+counting visitors into Lambda.
+
+Additionally, the API becomes accessible from the internet only after it has
+been staged. Invoke the API using the stage's URL combined with the resource
+path, along with any path parameters or query strings.
+
+- [Create an API with Lambda]
+- [Create a more complicated API with Lambda]
+- [Mapping template transformations for REST APIs in API Gateway]
+- [Variables for data transformations for API Gateway]
+
+[Create an API with Lambda]:
+    https://docs.aws.amazon.com/apigateway/latest/developerguide/getting-started-lambda-non-proxy-integration.html#getting-started-new-api
+
+[Create a more complicated API with Lambda]:
+    https://docs.aws.amazon.com/apigateway/latest/developerguide/integrating-api-with-aws-services-lambda.html
+
+[Mapping template transformations for REST APIs in API Gateway]:
+    https://docs.aws.amazon.com/apigateway/latest/developerguide/models-mappings.html
+
+[Variables for data transformations for API Gateway]:
+    https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-mapping-template-reference.html
+
+> [!NOTE]
+> The Lambda context object and API Gateway context variable are not
+> the same.
+
+#### DynamoDB
+
+I ended up creating two separate tables: one to store hashed user IP addresses
+along with browser information, and another to track the visitor count.
+Although having an entire table dedicated to a single counter felt like
+overkill, I wasn’t able to come up with a schema that made sense for combining
+everything into one.
+
+DynamoDB can be accessed from Python using the boto3 library. There are two
+main interfaces: [`DynamoDB.Client`], which represents the entire DynamoDB
+service and [`DynamoDB.Table`], which represents a specific table. They share
+a lot of the same functionality, but I found Table's parameter formatting to be
+cleaner and easier to write than Client's.
+
+[`DynamoDB.Client`]:
+    https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/dynamodb.html
+
+[`DynamoDB.Table`]:
+    https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/dynamodb/table/index.html
+
+- [Learn boto3]
+
+[Learn boto3]:
+    https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/programming-with-python.html
+
+#### JavaScript
+
+To invoke the API from the website, generate an SDK from the API Gateway stage
+and use the provided functions to make requests. Use the developer console in
+your browser to view the requests from your site and the responses from your
+API. CORS can make this setup a bit tricky, but API Gateway provides an Enable
+CORS option that handles the necessary configuration automatically.
 
 ### 7. pytests
 
-When migrating to local development, I wanted to replicate the integrated test
-function available in the Lambda online console. Using pytest enabled me to
-practice test-driven development, automate testing, and accelerate the
-development process.
+Up to this point, all Lambda code had been written, tested, and deployed
+directly through the AWS Console. Using a testing framework such as [pytest]
+requires developing locally, so I had to transition away from the online
+console. Also, without any infrastructure as code (Terraform), deploying
+updates to AWS isn't possible. Luckily, running and testing Lambda can be done
+completely offline with the mock boto3 library: moto.
 
-I configured my Python virtual environment to run pytest-watch on startup,
-which automatically runs tests when the source files are saved. Using
-pytest-xdist makes it possible to run tests in parallel, speeding up test
-times. Configuration of pytest.ini is needed to use pytest-xdist automatically
-when pytest-watch runs the tests.
+[pytest]:
+    https://docs.pytest.org/en/stable/
 
-To autorun tests:
-    Add to the venv/bin/activate file:
-      gnome-terminal -- bash -c "ptw --ext=.py,.json"
-    If your terminal is different, change "gnome-terminal"
+While reading about how to use [moto for unit testing], I learned that
+passing in a table object to each function, instead of a global
+variable, makes testing much simpler. This isolates each function from the
+rest of the code and makes passing mock tables easy. I recommend a wrapper
+class for resource tables to make the code cleaner and more organized.
+
+[moto for unit testing]:
+    https://aws.amazon.com/blogs/devops/unit-testing-aws-lambda-with-python-and-mock-aws-services/
+
+#### Fixtures and Parameterization
+
+In my experience, the Pytest documentation can feel a bit scattered, so I
+wanted to highlight and clarify two particularly useful features.
+
+[Fixtures] are setup functions that run automatically when a test function
+includes an argument with the same name. They’re especially helpful for
+initializing mock AWS resources.
+
+[Fixtures]: https://docs.pytest.org/en/stable/how-to/fixtures.html
+
+[Parameterized fixtures and tests] allow multiple sets of arguments to be
+passed into a single test or fixture, enabling the same test to run under
+different conditions. You can create a single set for all parameters or a set
+per each. The latter will run the test with every combination of parameters:
+
+[Parameterized fixtures and tests]: https://docs.pytest.org/en/stable/how-to/parametrize.html#parametrize-basics
+
+```py
+import pytest
+
+# Tests [(0,9), (0,8), (0,7), (1,9), (1,8), (1,7), (2,9), (2,8), (2,7)]
+@pytest.mark.parametrize("a", [9, 8, 7])
+@pytest.mark.parametrize("b", [0, 1, 2])
+def test_eval(a, b):
+    assert a + b == b + a
+```
+
+[Indirect parameterization] is used to pass parameters to a fixture. I used
+this to change the setup of mock tables.
+
+[Indirect parameterization]:
+    https://docs.pytest.org/en/stable/example/parametrize.html#indirect-parametrization
+
+#### Python Virtual Environment
+
+I configured a [Python virtual environment] to run [pytest-watch] on
+startup, which automatically runs tests when a source file is saved. Using
+[pytest-xdist] makes it possible to run tests in parallel, speeding up test
+times. Configuration of a `pytest.ini` is needed to use pytest-xdist
+automatically when pytest-watch invokes the pytests.
+
+[Python virtual environment]:
+    https://realpython.com/python-virtual-environments-a-primer/
+
+[pytest-watch]:
+    https://pypi.org/project/pytest-watch/
+
+[pytest-xdist]:
+    https://pypi.org/project/pytest-xdist/
 
 ```ini
 # pytest.ini
@@ -415,82 +595,206 @@ To autorun tests:
 addopts = -n auto --disable-warnings
 ```
 
+> [!TIP]
+> To autorun tests in a new terminal when the virtual environment is activated,
+> add `gnome-terminal -- bash -c "ptw --ext=.py,.json"` to the
+> venv/bin/activate file.
+
 ### 8. Terraform
 
-Use the existing AWS infrastructure as a reference when writing Terraform for
-this project. Create identical resources with Terraform and then replace the
-original. Leverage AWS CLI commands to gather the required details for
-Terraform definitions. For example, the [get-method CLI
-command][cli_get_method] returns the data needed for defining the [API Gateway
-method in Terraform][api_gateway_method].
+This was probably my favorite part of the project. It's a great combination of
+a scavenger hunt and problem solving. I converted each existing resource into
+its corresponding terraform configuration. The AWS CLI commands are amazing for
+gathering the required details for Terraform definitions. For example, the
+[`aws apigateway get-method`] command returns the data needed for defining
+the Terraform [`aws_api_gateway_method`] resource. Read over the [Terraform
+getting-started page] on the official CRC GitHub for a general overview and
+guidance.
 
-- [Terraform AWS documentation][terraform_aws_doc]
-
-If you have zero Terraform experience like I did, Rahul Wagh has a fantastic
-video on [how to create a Lambda function is
-Terraform][deploy_lambda_with_terraform], which cleared up a lot of confusion.
-
-For Lambda, utilize the `source_code_hash` argument to trigger a rebuild
-whenever the Python code changes and remember to create an
-`aws_lambda_permission` resource for API Gateway when you get there.
-
-For API Gateway, remember to take care of the SDK generation. I use the
-`terraform_data` resource to run a bash shell script to update the JavaScript
-files.
-
-[api_gateway_method]:
+[`aws apigateway get-method`]:
     https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/api_gateway_method
 
-[cli_get_method]:
+[`aws_api_gateway_method`]:
     https://awscli.amazonaws.com/v2/documentation/api/latest/reference/apigateway/get-method.html
 
-[terraform_aws_doc]:
+[Terraform getting-started page]:
+    https://github.com/cloudresumechallenge/projects/blob/main/projects/terraform/getting-started.md
+
+If you have zero Terraform experience like I did, Rahul Wagh has a fantastic
+video on [how to create a Lambda function in Terraform], which cleared up a
+lot of confusion.
+
+[how to create a Lambda function in Terraform]:
+    https://www.youtube.com/watch?v=JSR7U700h0U
+
+- [Terraform AWS documentation]
+- [Built-in functions] (`jsonencode`, `sha1`, and `join`)
+- [Absolute paths]
+- [Storing secrets]
+
+[Terraform AWS documentation]:
     https://registry.terraform.io/providers/hashicorp/aws/latest/docs
 
-[deploy_lambda_with_terraform]:
-    https://www.youtube.com/watch?v=JSR7U700h0U
+[Built-in functions]:
+    https://developer.hashicorp.com/terraform/language/functions
+
+[Absolute paths]:
+    https://developer.hashicorp.com/terraform/language/expressions/references#filesystem-and-workspace-info
+
+[Storing secrets]:
+    https://developer.hashicorp.com/terraform/tutorials/configuration-language/sensitive-variables#set-values-with-a-tfvars-file
+
+#### Reliable Change Detection for External Files
+
+The Terraform state file takes care of tracking changes within `main.tf`, but a
+bit more work is needed for external files. There are a few issues with relying
+on Terraform's state for managing external changes:
+
+1. Updates to resources triggered by external changes need to occur before
+   `terraform apply` runs. If changes happen after the apply phase completes,
+   Terraform won’t detect them, and the state file will become out of sync with
+   the actual infrastructure. As a result, Terraform won't recognize the new
+   state until you run `terraform plan` and `terraform apply` again to
+   reconcile the differences.
+
+2. Terraform doesn't have a consistent way to detect changes for multiple files
+   across different environments. Natively, Terraform can only hash a single
+   file. The workaround is to aggregate multiple files into a single zip and
+   hash that, but zips are terribly inconsistent across environments because of
+   metadata, file ordering and compression differences. This causes perpetual
+   state changes between local development and GitHub Actions.
+
+To solve this, I wrote a Bash script based on a tutorial on [how to calculate
+an MD5 checksum of a directory] in a way that’s consistent across environments.
+I then used Terraform’s [`external`] data source to invoke the script during
+the plan phase, enabling Terraform to track changes across multiple files
+reliably and deterministically.
+
+[how to calculate an MD5 checksum of a directory]:
+    https://www.baeldung.com/linux/directory-md5-checksum
+
+[`external`]:
+    https://registry.terraform.io/providers/hashicorp/external/latest/docs/data-sources/external
+
+#### Remote State
+
+Terraform maintains a state file that maps real-world infrastructure to your
+configuration and records associated metadata. For CI/CD, changes to the
+state need to be shared across local development and GitHub Actions. Setup of a remote state is incredibly straightforward with the use of an
+[S3 backend].
+
+[S3 backend]: https://developer.hashicorp.com/terraform/language/backend/s3
+
+[external]:
+    https://registry.terraform.io/providers/hashicorp/external/latest/docs/data-sources/external
+
+#### Resource Tips
+
+For Lambda, utilize the [`source_code_hash`] argument to trigger a rebuild
+whenever the Python code changes and remember to create an
+[`aws_lambda_permission`] resource to give API Gateway permission to invoke
+Lambda.
+
+[`source_code_hash`]:
+    https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lambda_function#source_code_hash-1
+
+[`aws_lambda_permission`]:
+    https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lambda_permission
+
+For API Gateway, remember to take care of the SDK generation. I used the
+[`terraform_data`] resource to run a bash shell script to update the
+JavaScript files.
+
+[`terraform_data`]:
+    https://developer.hashicorp.com/terraform/language/resources/terraform-data
 
 ### 9. Source Control
 
-Git and GitHub plus GitHub Projects. SOMUCHTODO
+All version control was handled using Git and GitHub. While the project guide
+recommends maintaining separate repositories for the frontend and backend, I
+chose to use a single repository. To me, this is one cohesive project, not
+two, and managing it in a monorepo makes it easier to track changes and keep
+everything in sync.
 
-### 10. CI/CD
+### 10. CI/CD with GitHub Actions
 
-GitHub Actions. SOMUCHTODO
+GitHub Actions enables automated testing and deployment workflows. I used it to
+run Pytest and Terraform commands after changes are pushed to the repository.
+To get started, check out the [GitHub Actions overview] to understand how
+workflows are structured. From there, it's mostly about learning the YAML
+syntax and exploring useful actions and integrations. Github also has a
+tutorial on [how to build and test Python] that helped me get started with some
+hands-on practice. Using AWS from Terraform requires credentials. Follow this
+tutorial to learn [how to configure OpenID Connect between GitHub Actions and
+AWS].
 
-## Technology Used
+[GitHub Actions overview]:
+    https://docs.github.com/en/actions/about-github-actions/understanding-github-actions
 
-- [AWS CLI][aws_cli]
-- [Hugo][hugo]
-- [pytest][pytest]
-- [PlayWright for Python][playwright_for_python]
-- [Terraform][terraform]
+[how to build and test Python]:
+    https://docs.github.com/en/actions/use-cases-and-examples/building-and-testing/building-and-testing-python
 
-- Git
-- Github
-- VSCode
-- Ubuntu
-- Firefox Developer Tools
+[how to configure OpenID Connect between GitHub Actions and AWS]:
+    https://aws.amazon.com/blogs/security/use-iam-roles-to-connect-github-actions-to-actions-in-aws/
 
-<!-- reference links -->
+To my massive disappointment, workflows can _only_ be ran or tested after
+pushing code to GitHub. This makes testing and learning slow and repetitive
+since you end up making tons of commits just to debug a single workflow.
+[`act`] is a commandline tool that lets you run GitHub Actions locally for
+faster feedback and less repetition. While there’s a fair amount of
+configuration needed to get it behaving like the real GitHub Actions
+environment, I think it’s totally worth it. I ran into a few bugs that would
+have been much harder to catch without `act`'s detailed, verbose output.
 
-[aws_cli]:
-    https://awscli.amazonaws.com/v2/documentation/api/latest/reference/index.html
+[`act`]: https://nektosact.com/introduction.html
 
-[hugo]:
-    https://gohugo.io/documentation/
+A few tips:
 
-[giraffe_academy]:
-    https://youtube.com/playlist?list=PLLAZ4kZ9dFpOnyRlyS-liKL5ReHDcj4G3&feature=shared
+- You'll need to create a Docker image that has the AWS CLI installed to run
+  AWS commands.
+- Commands may output twice. Use `--quiet` to stop `act` from printing what a
+  command has already printed.
+- Every time `act` runs, it copies your local Git repo. Any file modifications
+  inside the container will be discarded when it finishes. However, remote
+  changes, like updates to your Terraform backend or commits to GitHub, do
+  persist. Keep that in mind while testing.
+- `act` cannot use OIDC to get credentials. You'll have to use your local SSO
+  credentials to use AWS.
+- Remember to set identical environment variables in `act` and in GitHub.
+- Terraform variables can be set with `TF_VAR_example_var` in the workflow.
 
-[pytest]:
-    https://docs.pytest.org/en/stable/
+Check out my bash script for an idea of what options are needed to run `act`:
 
-[playwright_for_python]:
-    https://playwright.dev/python/docs/api/class-playwright
+```sh
+#!/usr/bin/bash
 
-[python_virtual_environments]:
-    https://realpython.com/python-virtual-environments-a-primer/
+git_root=$(git rev-parse --show-toplevel)
 
-[terraform]:
-    https://developer.hashicorp.com/terraform?product_intent=terraform
+cd "${git_root}"
+
+act push \
+--action-offline-mode \
+-P ubuntu-24.04=my-act-aws-image \
+-W "${git_root}/.github/workflows/run_terraform.yaml" \
+--secret-file "${git_root}/act/inputs/.secrets" \
+--env-file "${git_root}/act/inputs/.env" \
+--var-file "${git_root}/act/inputs/.vars" \
+--artifact-server-path "${git_root}/act/artifacts"
+```
+
+## Conclusion
+
+This project was a deep dive into cloud engineering, infrastructure as code,
+and CI/CD automation. From provisioning AWS resources with Terraform to setting
+up robust pipelines with GitHub Actions, every step challenged me to learn
+something new and solve real-world problems.
+
+Along the way, I developed skills in cloud architecture, scripting, security
+best practices, and testing—building a strong foundation for my goal of
+becoming a DevOps Engineer.
+
+If you're working on the Cloud Resume Challenge or exploring similar projects,
+I hope this write-up helps. Feel free to explore the repo, fork it, or reach
+out if you have questions or feedback.
+
+Thanks for reading!
