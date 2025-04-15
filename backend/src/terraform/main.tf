@@ -441,6 +441,7 @@ resource "aws_lambda_function" "site_lambda_func" {
   depends_on = [
     aws_iam_role_policy_attachment.attach_policy_to_lambda_role,
     aws_cloudwatch_log_group.site_lambda_log_group,
+    resource.terraform_data.zip_lambda
   ]
 
   environment {

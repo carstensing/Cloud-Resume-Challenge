@@ -2,7 +2,7 @@ name: Lambda Test
 
 on:
   push:
-    branches: [ "main", "dev" ]
+    branches: [ "main" ]
 
 permissions:
   contents: read # Required for actions/checkout

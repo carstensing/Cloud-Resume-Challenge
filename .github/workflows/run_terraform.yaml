@@ -2,7 +2,7 @@ name: Run Terraform
 
 on:
   push:
-    branches: [ "main", "dev" ]
+    branches: [ "main" ]
   workflow_dispatch: # Allows manual triggering
 
 permissions:
