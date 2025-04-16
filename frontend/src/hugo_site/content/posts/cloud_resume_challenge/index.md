@@ -1,7 +1,7 @@
 +++
 date = "2024-10-17T14:55:59-07:00"
 draft = false
-lastmod = "2025-04-11"
+lastmod = "2025-04-15"
 title = "The Cloud Resume Challenge – A Technical Overview"
 summary = """How I built my website with AWS, infrastructure as code, and
 CI/CD to showcase practical DevOps and cloud engineering skills."""
@@ -65,7 +65,7 @@ practice. I found it to be incredibly helpful.
 
 [project guide]: https://cloudresumechallenge.dev/book/
 
-General outline:
+#### Outline
 
 - **Certification**: Obtain a cloud certification (AWS Certified Cloud
   Practitioner).
@@ -80,6 +80,12 @@ General outline:
 
 - **CI/CD**: Setup automated testing (pytest and PlayWright) and deployment
   pipelines (GitHub Actions).
+
+#### Site Diagram
+
+![Site Diagram]
+
+[Site Diagram]: ./images/site_diagram.svg
 
 ## Steps I Took
 
@@ -97,20 +103,20 @@ I spent over 60 hours watching lectures, reading, and answering over 1900
 practice problems. **Make sure your study material is up to date** with the
 current exam version and outline. I studied old material which set me back some
 time. I watched [Andrew Brown's lecture videos] and studied practice
-questions, which have now been remove for whatever reason.
+questions.
 
 [Andrew Brown's lecture videos]:
     https://www.youtube.com/watch?v=NhDYbskXRgc&list=LL&index=11
 
 However, **I'd recommend doing the exam after the project** since the hands-on
 learning is so much more effective and unified. The project may be more
-difficult to digest in the beginning, but the process of trial and error is
-what will really cement in information. Also, without any experience with how
+difficult to digest in the beginning, but the process of trial-and-error is
+what really solidifies information. Also, without any experience with how
 services are connected, studying for the exam is straight memorization which
 isn't very useful.
 
-After completing this project, I intend on obtaining the [AWS Certified
-Solutions Architect] certification as well.
+After completing this project, I intend to obtain the [AWS Certified
+Solutions Architect] certification.
 
 [AWS Certified Solutions Architect]:
     https://aws.amazon.com/certification/certified-solutions-architect-professional/
@@ -150,7 +156,7 @@ governance, cost optimization, and automation at scale.
 [Terminology and concepts for AWS Organizations]:
     https://docs.aws.amazon.com/organizations/latest/userguide/orgs_getting-started_concepts.html
 
-Besides to get some hands-on experience, why did I use it for a single-person
+Other than gaining hands-on experience, why use AWS for a single-person
 project?
 
 #### Account Protection
@@ -379,7 +385,7 @@ profiles, to ensure actions are performed with the correct profile.
 
 ### 6. DynamoDB, Lambda, API Gateway and JavaScript
 
-I learned a **ton** on this chuck of the project. I understood the concept of
+I learned a **ton** on this portion of the project. I understood the concept of
 how a website, a database and an API interacted, but actually building it all
 really challenged me.
 
@@ -389,15 +395,11 @@ for processing. Lambda can interact with services like DynamoDB or perform
 other tasks, then return a response to API Gateway, which sends the final
 result back to Hugo.
 
-I broke everything down into the smallest steps I could and then pieced them
-together to slowly.
-
 #### Lambda
 
-Lambda is invoked from another service and is passed an event object. The exact
-format of the event object depends on the service that's invoking your
-function. Testing a Lambda function is simply passing a mock event. Lambda can
-interact with other services through libraries.
+Lambda receives an event object whose format depends on the service that's
+invoking it. Testing a Lambda is as simple as passing in a mock event object.
+Lambda can also interact with other services through libraries.
 
 - [How to use the Lambda console]
 - [Learn about the Lambda handler]
@@ -425,8 +427,8 @@ integration request stage. This is important for getting information related to
 counting visitors into Lambda.
 
 Additionally, the API becomes accessible from the internet only after it has
-been staged. To invoke the API with just a URL, combine the stage’s invoke URL
-with the resource path, along with any path parameters or query strings.
+been staged. Invoke the API using the stage's URL combined with the resource
+path, along with any path parameters or query strings.
 
 - [Create an API with Lambda]
 - [Create a more complicated API with Lambda]
@@ -594,7 +596,7 @@ lot of confusion.
     https://www.youtube.com/watch?v=JSR7U700h0U
 
 - [Terraform AWS documentation]
-- [Built-in functions] (jsonencode, sha1, and join)
+- [Built-in functions] (`jsonencode`, `sha1`, and `join`)
 - [Absolute paths]
 - [Storing secrets]
 
@@ -676,8 +678,91 @@ JavaScript files.
 
 ### 9. Source Control
 
-Git and GitHub plus GitHub Projects. TODO
+All version control was handled using Git and GitHub. While the project guide
+recommends maintaining separate repositories for the frontend and backend, I
+chose to use a single repository. To me, this is one cohesive project, not
+two, and managing it in a monorepo makes it easier to track changes and keep
+everything in sync.
 
-### 10. CI/CD
+### 10. CI/CD with GitHub Actions
 
-GitHub Actions. TODO
+GitHub Actions enables automated testing and deployment workflows. I used it to
+run Pytest and Terraform commands after changes are pushed to the repository.
+To get started, check out the [GitHub Actions overview] to understand how
+workflows are structured. From there, it's mostly about learning the YAML
+syntax and exploring useful actions and integrations. Github also has a
+tutorial on [how to build and test Python] that helped me get started with some
+hands-on practice. Using AWS from Terraform requires credentials. Follow this
+tutorial to learn [how to configure OpenID Connect between GitHub Actions and
+AWS].
+
+[GitHub Actions overview]:
+    https://docs.github.com/en/actions/about-github-actions/understanding-github-actions
+
+[how to build and test Python]:
+    https://docs.github.com/en/actions/use-cases-and-examples/building-and-testing/building-and-testing-python
+
+[how to configure OpenID Connect between GitHub Actions and AWS]:
+    https://aws.amazon.com/blogs/security/use-iam-roles-to-connect-github-actions-to-actions-in-aws/
+
+To my massive disappointment, workflows can _only_ be ran or tested after
+pushing code to GitHub. This makes testing and learning slow and repetitive
+since you end up making tons of commits just to debug a single workflow.
+[`act`] is a commandline tool that lets you run GitHub Actions locally for
+faster feedback and less repetition. While there’s a fair amount of
+configuration needed to get it behaving like the real GitHub Actions
+environment, I think it’s totally worth it. I ran into a few bugs that would
+have been much harder to catch without `act`'s detailed, verbose output.
+
+[`act`]: https://nektosact.com/introduction.html
+
+A few tips:
+
+- You'll need to create a Docker image that has the AWS CLI installed to run
+  AWS commands.
+- Commands may output twice. Use `--quiet` to stop `act` from printing what a
+  command has already printed.
+- Every time `act` runs, it copies your local Git repo. Any file modifications
+  inside the container will be discarded when it finishes. However, remote
+  changes, like updates to your Terraform backend or commits to GitHub, do
+  persist. Keep that in mind while testing.
+- `act` cannot use OIDC to get credentials. You'll have to use your local SSO
+  credentials to use AWS.
+- Remember to set identical environment variables in `act` and in GitHub.
+- Terraform variables can be set with `TF_VAR_example_var` in the workflow.
+
+Check out my bash script for an idea of what options are needed to run `act`:
+
+```sh
+#!/usr/bin/bash
+
+git_root=$(git rev-parse --show-toplevel)
+
+cd "${git_root}"
+
+act push \
+--action-offline-mode \
+-P ubuntu-24.04=my-act-aws-image \
+-W "${git_root}/.github/workflows/run_terraform.yaml" \
+--secret-file "${git_root}/act/inputs/.secrets" \
+--env-file "${git_root}/act/inputs/.env" \
+--var-file "${git_root}/act/inputs/.vars" \
+--artifact-server-path "${git_root}/act/artifacts"
+```
+
+## Conclusion
+
+This project was a deep dive into cloud engineering, infrastructure as code,
+and CI/CD automation. From provisioning AWS resources with Terraform to setting
+up robust pipelines with GitHub Actions, every step challenged me to learn
+something new and solve real-world problems.
+
+Along the way, I developed skills in cloud architecture, scripting, security
+best practices, and testing—building a strong foundation for my goal of
+becoming a DevOps Engineer.
+
+If you're working on the Cloud Resume Challenge or exploring similar projects,
+I hope this write-up helps. Feel free to explore the repo, fork it, or reach
+out if you have questions or feedback.
+
+Thanks for reading!
