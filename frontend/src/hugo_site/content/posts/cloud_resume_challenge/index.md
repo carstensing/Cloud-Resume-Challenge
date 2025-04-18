@@ -1,7 +1,7 @@
 +++
 date = "2024-10-17T14:55:59-07:00"
 draft = false
-lastmod = "2025-04-15"
+lastmod = "2025-04-17"
 title = "The Cloud Resume Challenge – A Technical Overview"
 summary = """How I built my website with AWS, infrastructure as code, and
 CI/CD to showcase practical DevOps and cloud engineering skills."""
@@ -78,7 +78,7 @@ practice. I found it to be incredibly helpful.
 
 - **Infrastructure as Code (IaC)**: Automate deployments with Terraform.
 
-- **CI/CD**: Setup automated testing (pytest and PlayWright) and deployment
+- **CI/CD**: Setup automated testing (pytest) and deployment
   pipelines (GitHub Actions).
 
 #### Site Diagram
@@ -100,20 +100,15 @@ for the [AWS Certified Cloud Practitioner] exam.
     https://aws.amazon.com/certification/certified-cloud-practitioner/
 
 I spent over 60 hours watching lectures, reading, and answering over 1900
-practice problems. **Make sure your study material is up to date** with the
-current exam version and outline. I studied old material which set me back some
-time. I watched [Andrew Brown's lecture videos] and studied practice
-questions.
+practice problems. Make sure your study material is up to date with the
+current exam version and outline. I mistakenly studied some old material, which
+set me back some time. Andrew Brown has an excellent, [free lecture series for
+the CCP exam] that I used to pass the exam.
 
-[Andrew Brown's lecture videos]:
+[free lecture series for the CCP exam]:
     https://www.youtube.com/watch?v=NhDYbskXRgc&list=LL&index=11
 
-However, **I'd recommend doing the exam after the project** since the hands-on
-learning is so much more effective and unified. The project may be more
-difficult to digest in the beginning, but the process of trial-and-error is
-what really solidifies information. Also, without any experience with how
-services are connected, studying for the exam is straight memorization which
-isn't very useful.
+In hindsight, I’d recommend taking the exam _after_ completing the project, since the hands-on learning is far more effective and cohesive. While the project might be harder to grasp at first, the trial-and-error process is what truly helps the information stick. Without any real experience connecting services, studying for the exam ends up being mostly memorization—which isn’t nearly as valuable or practical.
 
 After completing this project, I intend to obtain the [AWS Certified
 Solutions Architect] certification.
@@ -123,13 +118,15 @@ Solutions Architect] certification.
 
 ### 2. Hugo Static Site
 
-I wanted to create a website that I could use for more than my resume.
-Something simple that worked with Markdown so I could reuse my repository
-READMEs. My search lead me to a static website framework called Hugo. Hugo
-builds and serves the site to a localhost, providing a real-time preview of the
-site. This is super handy for developing locally before moving onto hosting
-with AWS. Overall, I'm happy that I chose to use Hugo over building a basic
-HTML and CSS static site that I would dread updating.
+I wanted to create a website that could be used for more than just my
+resume—something simple and well-suited for developers. Hugo is an open-source
+static site generator that uses Markdown files as content sources, making it
+easy to integrate with content on GitHub. It’s easy to learn, and with a wide
+selection of themes available, you can get a polished website up and running
+quickly. Hugo can build and serve your site to a localhost, providing a
+real-time preview while developing locally. Overall, I'm happy that I chose to
+use Hugo over building a basic HTML and CSS static site that I would dread
+updating and maintaining.
 
 Free Resources to learn Hugo:
 
@@ -243,10 +240,10 @@ login is very convenient to use, even from the CLI.
 
 ### 4. S3, Route53 and Cloudfront
 
-I purchased a domain name through Route 53 and created an S3 bucket to store my
-site files built by Hugo. After that, I used CloudFront to enable HTTPS and
-content delivery. AWS has guides on how to do all of this, but it can still be
-tricky. Follow them in this order:
+I purchased a domain name through **Route53** and created an **S3** bucket to
+store my site files built by Hugo. After that, I used **CloudFront** to enable
+HTTPS and content delivery. AWS has guides on how to do all of this, but it can
+still be tricky. Follow them in this order:
 
 - [Configuring a static site using a custom domain registered with Route 53]
 - [Requesting a public certificate with ACM for HTTPS] (step 2 only)
@@ -270,6 +267,25 @@ For DNS to work properly, the name servers connected to the registered domain
 in Route 53 must match the same name servers in the hosted zone. The hosted
 zone's name servers cannot be set manually, so you'll have to update the
 registered domain.
+
+#### `s3 sync --delete` Bug
+
+The easiest way to update S3 is by using the aws s3 sync my_website s3_bucket
+--delete command, which recursively copies new and updated files from the
+source directory to the destination. The --delete option removes files from the
+destination that no longer exist in the source.
+
+This would have made my life much easier—except I noticed that files weren’t
+actually being deleted correctly. In hindsight, this may have been a mistake on
+my part, but at the time I was convinced I needed to circumvent syncing
+directories.
+
+My solution was to manually identify all new, updated, and deleted files, and
+then sync each file individually. Running the command this way solved the issue
+with deletions not working properly. I had to learn a lot about bash scripts in
+order to parse and format the files paths, so this portion took me a while to
+get right. Fortunately, that experience made future scripting tasks much
+easier.
 
 #### CloudFront Cache Update
 
@@ -327,9 +343,7 @@ project.
 Each deleted or modified file must be explicitly listed in the invalidation
 request with its full bucket path. The entire cache can be invalidated easily,
 or specific file paths can be copied and pasted for targeted invalidation,
-making small updates and testing straightforward. Generating invalidations
-automatically took some bash scripting with regular expressions but wan't too
-complicated overall.
+making small updates and testing straightforward.
 
 ### 5. AWS CLI
 
@@ -385,15 +399,25 @@ profiles, to ensure actions are performed with the correct profile.
 
 ### 6. DynamoDB, Lambda, API Gateway and JavaScript
 
-I learned a **ton** on this portion of the project. I understood the concept of
-how a website, a database and an API interacted, but actually building it all
-really challenged me.
+The goal of this portion of the project is to implement a visitor counter that
+displays how many people have accessed the website. I learned a _ton_ on this
+portion of the project. I understood the concept of how a website, a database
+and an API interacted, but actually building it all really challenged me.
 
-API Gateway generates JavaScript used by Hugo to perform REST API requests.
-When a request is made, API Gateway forwards the relevant information to Lambda
-for processing. Lambda can interact with services like DynamoDB or perform
-other tasks, then return a response to API Gateway, which sends the final
-result back to Hugo.
+- **Lambda** contains the logic that processes requests and updates the visitor
+  count.
+- **DynamoDB** stores the current count as well as hashed IP and browser data to
+  prevent duplicate counts of the same person.
+- **API Gateway** exposes the Lambda function to the internet, allowing the
+  frontend to make HTTP requests.
+- **JavaScript** on the website sends a request to API Gateway when the page loads,
+  triggering the Lambda function and retrieving the updated visitor count.
+
+To go full circle: API Gateway generates the JavaScript used by the website to
+perform REST API requests. When a request is made, API Gateway forwards the
+relevant information to Lambda for processing. Lambda handles the logic and
+interacts with services like DynamoDB, then returns a response to API Gateway,
+which delivers the final result back to the website.
 
 #### Lambda
 
