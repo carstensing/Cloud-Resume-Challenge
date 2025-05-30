@@ -137,7 +137,12 @@ the CCP exam] that I used to pass the exam.
 [free lecture series for the CCP exam]:
     https://www.youtube.com/watch?v=NhDYbskXRgc&list=LL&index=11
 
-In hindsight, I’d recommend taking the exam _after_ completing the project, since the hands-on learning is far more effective and cohesive. While the project might be harder to grasp at first, the trial-and-error process is what truly helps the information stick. Without any real experience connecting services, studying for the exam ends up being mostly memorization—which isn’t nearly as valuable or practical.
+In hindsight, I’d recommend taking the exam _after_ completing the project,
+since the hands-on learning is far more effective and cohesive. While the
+project might be harder to grasp at first, the trial-and-error process is what
+truly helps the information stick. Without any real experience connecting
+services, studying for the exam ends up being mostly memorization—which isn’t
+nearly as valuable or practical.
 
 After completing this project, I intend to obtain the [AWS Certified
 Solutions Architect] certification.
@@ -436,12 +441,12 @@ in the process.
 
 - **Lambda** contains the logic that processes requests and updates the visitor
   count.
-- **DynamoDB** stores the current count as well as hashed visitor info to prevent
-  duplicate counts of the same person.
-- **API Gateway** exposes the Lambda function to the internet, allowing the backend
-  to make HTTP requests.
-- **JavaScript** in the website sends a request to API Gateway when the home page
-  loads, triggering Lambda and retrieving the updated visitor count.
+- **DynamoDB** stores the current count as well as hashed visitor info to
+  prevent duplicate counts of the same person.
+- **API Gateway** exposes the Lambda function to the internet, allowing the
+  backend to make HTTP requests.
+- **JavaScript** in the website sends a request to API Gateway when the home
+  page loads, triggering Lambda and retrieving the updated visitor count.
 
 To go full circle: API Gateway generates the JavaScript used by the website to
 perform REST API requests. When a request is made, API Gateway forwards the
