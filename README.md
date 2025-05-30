@@ -129,20 +129,15 @@ for the [AWS Certified Cloud Practitioner] exam.
     https://aws.amazon.com/certification/certified-cloud-practitioner/
 
 I spent over 60 hours watching lectures, reading, and answering over 1900
-practice problems. **Make sure your study material is up to date** with the
-current exam version and outline. I studied old material which set me back some
-time. I watched [Andrew Brown's lecture videos] and studied practice
-questions.
+practice problems. Make sure your study material is up to date with the
+current exam version and outline. I mistakenly studied some old material, which
+set me back some time. Andrew Brown has an excellent, [free lecture series for
+the CCP exam] that I used to pass the exam.
 
-[Andrew Brown's lecture videos]:
+[free lecture series for the CCP exam]:
     https://www.youtube.com/watch?v=NhDYbskXRgc&list=LL&index=11
 
-However, **I'd recommend doing the exam after the project** since the hands-on
-learning is so much more effective and unified. The project may be more
-difficult to digest in the beginning, but the process of trial-and-error is
-what really solidifies information. Also, without any experience with how
-services are connected, studying for the exam is straight memorization which
-isn't very useful.
+In hindsight, I’d recommend taking the exam _after_ completing the project, since the hands-on learning is far more effective and cohesive. While the project might be harder to grasp at first, the trial-and-error process is what truly helps the information stick. Without any real experience connecting services, studying for the exam ends up being mostly memorization—which isn’t nearly as valuable or practical.
 
 After completing this project, I intend to obtain the [AWS Certified
 Solutions Architect] certification.
@@ -152,13 +147,15 @@ Solutions Architect] certification.
 
 ### 2. Hugo Static Site
 
-I wanted to create a website that I could use for more than my resume.
-Something simple that worked with Markdown so I could reuse my repository
-READMEs. My search lead me to a static website framework called Hugo. Hugo
-builds and serves the site to a localhost, providing a real-time preview of the
-site. This is super handy for developing locally before moving onto hosting
-with AWS. Overall, I'm happy that I chose to use Hugo over building a basic
-HTML and CSS static site that I would dread updating.
+I wanted to create a website that could be used for more than just my
+resume—something simple and well-suited for developers. Hugo is an open-source
+static site generator that uses Markdown files as content sources, making it
+easy to integrate with content on GitHub. It’s easy to learn, and with a wide
+selection of themes available, you can get a polished website up and running
+quickly. Hugo can build and serve your site to a localhost, providing a
+real-time preview while developing locally. Overall, I'm happy that I chose to
+use Hugo over building a basic HTML and CSS static site that I would dread
+updating and maintaining.
 
 Free Resources to learn Hugo:
 
@@ -300,6 +297,25 @@ in Route 53 must match the same name servers in the hosted zone. The hosted
 zone's name servers cannot be set manually, so you'll have to update the
 registered domain.
 
+#### `s3 sync --delete` Bug
+
+The easiest way to update S3 is by using the aws s3 sync my_website s3_bucket
+--delete command, which recursively copies new and updated files from the
+source directory to the destination. The --delete option removes files from the
+destination that no longer exist in the source.
+
+This would have made my life much easier—except I noticed that files weren’t
+actually being deleted correctly. In hindsight, this may have been a mistake on
+my part, but at the time I was convinced I needed to circumvent syncing
+directories.
+
+My solution was to manually identify all new, updated, and deleted files, and
+then sync each file individually. Running the command this way solved the issue
+with deletions not working properly. I had to learn a lot about bash scripts in
+order to parse and format the files paths, so this portion took me a while to
+get right. Fortunately, that experience made future scripting tasks much
+easier.
+
 #### CloudFront Cache Update
 
 CloudFront caches S3 files for the static site so any S3 updates must be
@@ -356,9 +372,7 @@ project.
 Each deleted or modified file must be explicitly listed in the invalidation
 request with its full bucket path. The entire cache can be invalidated easily,
 or specific file paths can be copied and pasted for targeted invalidation,
-making small updates and testing straightforward. Generating invalidations
-automatically took some bash scripting with regular expressions but wan't too
-complicated overall.
+making small updates and testing straightforward.
 
 ### 5. AWS CLI
 
@@ -457,18 +471,20 @@ Lambda can also interact with other services through libraries.
 #### API Gateway
 
 Prior to this project, I had no experience working with APIs, so the tutorials
-listed below were extremely helpful in introducing the core concepts. I gained
-hands-on practice with different HTTP methods and responses, as well as path
-parameters, query strings, headers, and CORS.
+listed below were incredibly helpful for introducing the core concepts. Through
+hands-on practice, I became familiar with different HTTP methods and response
+types, as well as how to work with path parameters, query strings, headers, and
+CORS.
 
 One aspect that took a bit longer to fully understand was how the event JSON
 sent to Lambda is configured through the mapping template during the
 integration request stage. This is important for getting information related to
 counting visitors into Lambda.
 
-Additionally, the API becomes accessible from the internet only after it has
-been staged. Invoke the API using the stage's URL combined with the resource
-path, along with any path parameters or query strings.
+Additionally, an API deployed through API Gateway isn’t accessible from the
+internet until it’s been staged. Requests must be sent to the stage-specific
+URL, which includes the base invoke URL, the stage name, the resource path, and
+any relevant path parameters or query strings.
 
 - [Create an API with Lambda]
 - [Create a more complicated API with Lambda]
@@ -611,13 +627,13 @@ addopts = -n auto --disable-warnings
 ### 8. Terraform
 
 This was probably my favorite part of the project. It's a great combination of
-a scavenger hunt and problem solving. I converted each existing resource into
-its corresponding terraform configuration. The AWS CLI commands are amazing for
-gathering the required details for Terraform definitions. For example, the
-[`aws apigateway get-method`] command returns the data needed for defining
-the Terraform [`aws_api_gateway_method`] resource. Read over the [Terraform
-getting-started page] on the official CRC GitHub for a general overview and
-guidance.
+a scavenger hunt and problem solving. I converted each existing AWS resource
+into its corresponding terraform configuration. The AWS CLI commands are
+amazing for gathering the required details for Terraform definitions. For
+example, the [`aws apigateway get-method`] command returns the data needed for
+defining the Terraform [`aws_api_gateway_method`] resource. Read over the
+[Terraform getting-started page] on the official CRC GitHub for a general
+overview and guidance.
 
 [`aws apigateway get-method`]:
     https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/api_gateway_method
@@ -654,23 +670,23 @@ lot of confusion.
 
 #### Reliable Change Detection for External Files
 
-The Terraform state file takes care of tracking changes within `main.tf`, but a
-bit more work is needed for external files. There are a few issues with relying
-on Terraform's state for managing external changes:
+While the Terraform state file does a great job tracking changes within
+Terraform files, a bit more effort is needed when working with external files.
+There are a few issues with relying on Terraform's state for managing external
+changes:
 
-1. Updates to resources triggered by external changes need to occur before
-   `terraform apply` runs. If changes happen after the apply phase completes,
-   Terraform won’t detect them, and the state file will become out of sync with
-   the actual infrastructure. As a result, Terraform won't recognize the new
-   state until you run `terraform plan` and `terraform apply` again to
-   reconcile the differences.
+1. Updates to resources triggered by external changes need to occur _before_
+   the apply phase, or Terraform won’t detect them. This causes the state file
+   to fall out of sync with the live  infrastructure, requiring another `plan`
+   and `apply` to reconcile the difference.
 
 2. Terraform doesn't have a consistent way to detect changes for multiple files
-   across different environments. Natively, Terraform can only hash a single
-   file. The workaround is to aggregate multiple files into a single zip and
-   hash that, but zips are terribly inconsistent across environments because of
-   metadata, file ordering and compression differences. This causes perpetual
-   state changes between local development and GitHub Actions.
+   across different environments. Natively, Terraform can only compute a hash
+   for a single file. A common workaround is to bundle multiple files into a
+   zip and hash that instead. However, zips are highly inconsistent across
+   environments due to differences in metadata, file ordering, and compression.
+   This causes perpetual state changes between local development and GitHub
+   Actions.
 
 To solve this, I wrote a Bash script based on a tutorial on [how to calculate
 an MD5 checksum of a directory] in a way that’s consistent across environments.
@@ -724,10 +740,10 @@ chose to use a single repository. To me, this is one cohesive project, not
 two, and managing it in a monorepo makes it easier to track changes and keep
 everything in sync.
 
-### 10. CI/CD with GitHub Actions
+### 10. CI/CD With GitHub Actions
 
 GitHub Actions enables automated testing and deployment workflows. I used it to
-run Pytest and Terraform commands after changes are pushed to the repository.
+run pytest and Terraform commands after changes are pushed to the repository.
 To get started, check out the [GitHub Actions overview] to understand how
 workflows are structured. From there, it's mostly about learning the YAML
 syntax and exploring useful actions and integrations. Github also has a
@@ -794,12 +810,14 @@ act push \
 
 This project was a deep dive into cloud engineering, infrastructure as code,
 and CI/CD automation. From provisioning AWS resources with Terraform to setting
-up robust pipelines with GitHub Actions, every step challenged me to learn
-something new and solve real-world problems.
+up robust pipelines with GitHub Actions, each step presented new challenges
+that expanded my skills and knowledge.
 
-Along the way, I developed skills in cloud architecture, scripting, security
-best practices, and testing—building a strong foundation for my goal of
-becoming a DevOps Engineer.
+Throughout this journey, I strengthened my technical expertise in cloud
+engineering, DevOps practices, scripting, and testing—laying a solid foundation
+for my long-term goal of becoming a DevOps Engineer. I also refined my ability
+to quickly learn, adapt to new challenges, and manage multiple responsibilities
+effectively.
 
 If you're working on the Cloud Resume Challenge or exploring similar projects,
 I hope this write-up helps. Feel free to explore the repo, fork it, or reach
