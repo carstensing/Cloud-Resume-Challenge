@@ -1,7 +1,7 @@
 +++
 date = "2024-10-17T14:55:59-07:00"
 draft = false
-lastmod = "2025-04-18"
+lastmod = "2025-05-30"
 title = "The Cloud Resume Challenge – A Technical Overview"
 summary = """How I built my website with AWS, infrastructure as code, and
 CI/CD to showcase practical DevOps and cloud engineering skills."""
@@ -70,7 +70,7 @@ practice. I found it to be incredibly helpful.
 - **Certification**: Obtain a cloud certification (AWS Certified Cloud
   Practitioner).
 - **Frontend**: Create a static website (Hugo) and host it using a cloud
-  provider (S3, Route53 and CloudFront).
+  provider (S3, Route 53 and CloudFront).
 - **Backend**: Implement a visitor counter using a serverless function,
   database and a REST API (Lambda, DynamoDB and API Gateway).
 - **Infrastructure as Code**: Automate deployments with Terraform.
@@ -104,7 +104,12 @@ the CCP exam] that I used to pass the exam.
 [free lecture series for the CCP exam]:
     https://www.youtube.com/watch?v=NhDYbskXRgc&list=LL&index=11
 
-In hindsight, I’d recommend taking the exam _after_ completing the project, since the hands-on learning is far more effective and cohesive. While the project might be harder to grasp at first, the trial-and-error process is what truly helps the information stick. Without any real experience connecting services, studying for the exam ends up being mostly memorization—which isn’t nearly as valuable or practical.
+In hindsight, I’d recommend taking the exam _after_ completing the project,
+since the hands-on learning is far more effective and cohesive. While the
+project might be harder to grasp at first, the trial-and-error process is what
+truly helps the information stick. Without any real experience connecting
+services, studying for the exam ends up being mostly memorization—which isn’t
+nearly as valuable or practical.
 
 After completing this project, I intend to obtain the [AWS Certified
 Solutions Architect] certification.
@@ -234,9 +239,9 @@ login is very convenient to use, even from the CLI.
 > [!TIP]
 > To avoid frequent logins, set the session duration to more than an hour.
 
-### 4. S3, Route53 and Cloudfront
+### 4. S3, Route 53 and Cloudfront
 
-I purchased a domain name through **Route53** and created an **S3** bucket to
+I purchased a domain name through **Route 53** and created an **S3** bucket to
 store my site files built by Hugo. After that, I used **CloudFront** to enable
 HTTPS and content delivery. AWS has guides on how to do all of this, but it can
 still be tricky. Follow them in this order:
@@ -403,12 +408,12 @@ in the process.
 
 - **Lambda** contains the logic that processes requests and updates the visitor
   count.
-- **DynamoDB** stores the current count as well as hashed visitor info to prevent
-  duplicate counts of the same person.
-- **API Gateway** exposes the Lambda function to the internet, allowing the backend
-  to make HTTP requests.
-- **JavaScript** in the website sends a request to API Gateway when the home page
-  loads, triggering Lambda and retrieving the updated visitor count.
+- **DynamoDB** stores the current count as well as hashed visitor info to
+  prevent duplicate counts of the same person.
+- **API Gateway** exposes the Lambda function to the internet, allowing the
+  backend to make HTTP requests.
+- **JavaScript** in the website sends a request to API Gateway when the home
+  page loads, triggering Lambda and retrieving the updated visitor count.
 
 To go full circle: API Gateway generates the JavaScript used by the website to
 perform REST API requests. When a request is made, API Gateway forwards the
