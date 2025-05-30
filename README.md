@@ -34,8 +34,9 @@ the way.
         - [IAM Roles and Policies](#iam-roles-and-policies)
         - [Free Tier](#free-tier)
         - [SSO Login](#sso-login)
-    - [4. S3, Route53 and Cloudfront](#4-s3-route53-and-cloudfront)
+    - [4. S3, Route 53 and Cloudfront](#4-s3-route-53-and-cloudfront)
         - [Name Servers](#name-servers)
+        - [`s3 sync --delete` Bug](#s3-sync---delete-bug)
         - [CloudFront Cache Update](#cloudfront-cache-update)
             - [File Expiration](#file-expiration)
             - [Versioned File Names](#versioned-file-names)
@@ -55,7 +56,7 @@ the way.
         - [Remote State](#remote-state)
         - [Resource Tips](#resource-tips)
     - [9. Source Control](#9-source-control)
-    - [10. CI/CD with GitHub Actions](#10-cicd-with-github-actions)
+    - [10. CI/CD With GitHub Actions](#10-cicd-with-github-actions)
 - [Conclusion](#conclusion)
 
 ## Introduction
@@ -101,16 +102,12 @@ practice. I found it to be incredibly helpful.
 
 - **Certification**: Obtain a cloud certification (AWS Certified Cloud
   Practitioner).
-
 - **Frontend**: Create a static website (Hugo) and host it using a cloud
-  provider (S3, Route53 and CloudFront).
-
+  provider (S3, Route 53 and CloudFront).
 - **Backend**: Implement a visitor counter using a serverless function,
   database and a REST API (Lambda, DynamoDB and API Gateway).
-
-- **Infrastructure as Code (IaC)**: Automate deployments with Terraform.
-
-- **CI/CD**: Setup automated testing (pytest and PlayWright) and deployment
+- **Infrastructure as Code**: Automate deployments with Terraform.
+- **CI/CD**: Setup automated testing (pytest) and deployment
   pipelines (GitHub Actions).
 
 #### Site Diagram
@@ -273,12 +270,12 @@ login is very convenient to use, even from the CLI.
 > [!TIP]
 > To avoid frequent logins, set the session duration to more than an hour.
 
-### 4. S3, Route53 and Cloudfront
+### 4. S3, Route 53 and Cloudfront
 
-I purchased a domain name through Route 53 and created an S3 bucket to store my
-site files built by Hugo. After that, I used CloudFront to enable HTTPS and
-content delivery. AWS has guides on how to do all of this, but it can still be
-tricky. Follow them in this order:
+I purchased a domain name through **Route 53** and created an **S3** bucket to
+store my site files built by Hugo. After that, I used **CloudFront** to enable
+HTTPS and content delivery. AWS has guides on how to do all of this, but it can
+still be tricky. Follow them in this order:
 
 - [Configuring a static site using a custom domain registered with Route 53]
 - [Requesting a public certificate with ACM for HTTPS] (step 2 only)
@@ -417,15 +414,26 @@ profiles, to ensure actions are performed with the correct profile.
 
 ### 6. DynamoDB, Lambda, API Gateway and JavaScript
 
-I learned a **ton** on this portion of the project. I understood the concept of
-how a website, a database and an API interacted, but actually building it all
-really challenged me.
+The goal of this portion of the project is to implement a visitor counter that
+displays how many people have accessed the website. I had a general
+understanding of how a website, database, and API interact, but actually
+building and piecing everything together was a  challenge—and I learned a ton
+in the process.
 
-API Gateway generates JavaScript used by Hugo to perform REST API requests.
-When a request is made, API Gateway forwards the relevant information to Lambda
-for processing. Lambda can interact with services like DynamoDB or perform
-other tasks, then return a response to API Gateway, which sends the final
-result back to Hugo.
+- **Lambda** contains the logic that processes requests and updates the visitor
+  count.
+- **DynamoDB** stores the current count as well as hashed visitor info to prevent
+  duplicate counts of the same person.
+- **API Gateway** exposes the Lambda function to the internet, allowing the backend
+  to make HTTP requests.
+- **JavaScript** in the website sends a request to API Gateway when the home page
+  loads, triggering Lambda and retrieving the updated visitor count.
+
+To go full circle: API Gateway generates the JavaScript used by the website to
+perform REST API requests. When a request is made, API Gateway forwards the
+relevant information to Lambda for processing. Lambda handles the logic and
+interacts with services like DynamoDB, then returns a response to API Gateway,
+which delivers the final result back to the website.
 
 #### Lambda
 

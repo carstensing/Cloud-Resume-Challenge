@@ -1,7 +1,7 @@
 +++
 date = "2024-10-17T14:55:59-07:00"
 draft = false
-lastmod = "2025-04-15"
+lastmod = "2025-04-18"
 title = "The Cloud Resume Challenge – A Technical Overview"
 summary = """How I built my website with AWS, infrastructure as code, and
 CI/CD to showcase practical DevOps and cloud engineering skills."""
@@ -69,16 +69,12 @@ practice. I found it to be incredibly helpful.
 
 - **Certification**: Obtain a cloud certification (AWS Certified Cloud
   Practitioner).
-
 - **Frontend**: Create a static website (Hugo) and host it using a cloud
   provider (S3, Route53 and CloudFront).
-
 - **Backend**: Implement a visitor counter using a serverless function,
   database and a REST API (Lambda, DynamoDB and API Gateway).
-
-- **Infrastructure as Code (IaC)**: Automate deployments with Terraform.
-
-- **CI/CD**: Setup automated testing (pytest and PlayWright) and deployment
+- **Infrastructure as Code**: Automate deployments with Terraform.
+- **CI/CD**: Setup automated testing (pytest) and deployment
   pipelines (GitHub Actions).
 
 #### Site Diagram
@@ -385,15 +381,26 @@ profiles, to ensure actions are performed with the correct profile.
 
 ### 6. DynamoDB, Lambda, API Gateway and JavaScript
 
-I learned a **ton** on this portion of the project. I understood the concept of
-how a website, a database and an API interacted, but actually building it all
-really challenged me.
+The goal of this portion of the project is to implement a visitor counter that
+displays how many people have accessed the website. I had a general
+understanding of how a website, database, and API interact, but actually
+building and piecing everything together was a  challenge—and I learned a ton
+in the process.
 
-API Gateway generates JavaScript used by Hugo to perform REST API requests.
-When a request is made, API Gateway forwards the relevant information to Lambda
-for processing. Lambda can interact with services like DynamoDB or perform
-other tasks, then return a response to API Gateway, which sends the final
-result back to Hugo.
+- **Lambda** contains the logic that processes requests and updates the visitor
+  count.
+- **DynamoDB** stores the current count as well as hashed visitor info to prevent
+  duplicate counts of the same person.
+- **API Gateway** exposes the Lambda function to the internet, allowing the backend
+  to make HTTP requests.
+- **JavaScript** in the website sends a request to API Gateway when the home page
+  loads, triggering Lambda and retrieving the updated visitor count.
+
+To go full circle: API Gateway generates the JavaScript used by the website to
+perform REST API requests. When a request is made, API Gateway forwards the
+relevant information to Lambda for processing. Lambda handles the logic and
+interacts with services like DynamoDB, then returns a response to API Gateway,
+which delivers the final result back to the website.
 
 #### Lambda
 
@@ -417,18 +424,20 @@ Lambda can also interact with other services through libraries.
 #### API Gateway
 
 Prior to this project, I had no experience working with APIs, so the tutorials
-listed below were extremely helpful in introducing the core concepts. I gained
-hands-on practice with different HTTP methods and responses, as well as path
-parameters, query strings, headers, and CORS.
+listed below were incredibly helpful for introducing the core concepts. Through
+hands-on practice, I became familiar with different HTTP methods and response
+types, as well as how to work with path parameters, query strings, headers, and
+CORS.
 
 One aspect that took a bit longer to fully understand was how the event JSON
 sent to Lambda is configured through the mapping template during the
 integration request stage. This is important for getting information related to
 counting visitors into Lambda.
 
-Additionally, the API becomes accessible from the internet only after it has
-been staged. Invoke the API using the stage's URL combined with the resource
-path, along with any path parameters or query strings.
+Additionally, an API deployed through API Gateway isn’t accessible from the
+internet until it’s been staged. Requests must be sent to the stage-specific
+URL, which includes the base invoke URL, the stage name, the resource path, and
+any relevant path parameters or query strings.
 
 - [Create an API with Lambda]
 - [Create a more complicated API with Lambda]
@@ -571,13 +580,13 @@ addopts = -n auto --disable-warnings
 ### 8. Terraform
 
 This was probably my favorite part of the project. It's a great combination of
-a scavenger hunt and problem solving. I converted each existing resource into
-its corresponding terraform configuration. The AWS CLI commands are amazing for
-gathering the required details for Terraform definitions. For example, the
-[`aws apigateway get-method`] command returns the data needed for defining
-the Terraform [`aws_api_gateway_method`] resource. Read over the [Terraform
-getting-started page] on the official CRC GitHub for a general overview and
-guidance.
+a scavenger hunt and problem solving. I converted each existing AWS resource
+into its corresponding terraform configuration. The AWS CLI commands are
+amazing for gathering the required details for Terraform definitions. For
+example, the [`aws apigateway get-method`] command returns the data needed for
+defining the Terraform [`aws_api_gateway_method`] resource. Read over the
+[Terraform getting-started page] on the official CRC GitHub for a general
+overview and guidance.
 
 [`aws apigateway get-method`]:
     https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/api_gateway_method
@@ -614,23 +623,23 @@ lot of confusion.
 
 #### Reliable Change Detection for External Files
 
-The Terraform state file takes care of tracking changes within `main.tf`, but a
-bit more work is needed for external files. There are a few issues with relying
-on Terraform's state for managing external changes:
+While the Terraform state file does a great job tracking changes within
+Terraform files, a bit more effort is needed when working with external files.
+There are a few issues with relying on Terraform's state for managing external
+changes:
 
-1. Updates to resources triggered by external changes need to occur before
-   `terraform apply` runs. If changes happen after the apply phase completes,
-   Terraform won’t detect them, and the state file will become out of sync with
-   the actual infrastructure. As a result, Terraform won't recognize the new
-   state until you run `terraform plan` and `terraform apply` again to
-   reconcile the differences.
+1. Updates to resources triggered by external changes need to occur _before_
+   the apply phase, or Terraform won’t detect them. This causes the state file
+   to fall out of sync with the live  infrastructure, requiring another `plan`
+   and `apply` to reconcile the difference.
 
 2. Terraform doesn't have a consistent way to detect changes for multiple files
-   across different environments. Natively, Terraform can only hash a single
-   file. The workaround is to aggregate multiple files into a single zip and
-   hash that, but zips are terribly inconsistent across environments because of
-   metadata, file ordering and compression differences. This causes perpetual
-   state changes between local development and GitHub Actions.
+   across different environments. Natively, Terraform can only compute a hash
+   for a single file. A common workaround is to bundle multiple files into a
+   zip and hash that instead. However, zips are highly inconsistent across
+   environments due to differences in metadata, file ordering, and compression.
+   This causes perpetual state changes between local development and GitHub
+   Actions.
 
 To solve this, I wrote a Bash script based on a tutorial on [how to calculate
 an MD5 checksum of a directory] in a way that’s consistent across environments.
@@ -684,10 +693,10 @@ chose to use a single repository. To me, this is one cohesive project, not
 two, and managing it in a monorepo makes it easier to track changes and keep
 everything in sync.
 
-### 10. CI/CD with GitHub Actions
+### 10. CI/CD With GitHub Actions
 
 GitHub Actions enables automated testing and deployment workflows. I used it to
-run Pytest and Terraform commands after changes are pushed to the repository.
+run pytest and Terraform commands after changes are pushed to the repository.
 To get started, check out the [GitHub Actions overview] to understand how
 workflows are structured. From there, it's mostly about learning the YAML
 syntax and exploring useful actions and integrations. Github also has a
@@ -754,12 +763,14 @@ act push \
 
 This project was a deep dive into cloud engineering, infrastructure as code,
 and CI/CD automation. From provisioning AWS resources with Terraform to setting
-up robust pipelines with GitHub Actions, every step challenged me to learn
-something new and solve real-world problems.
+up robust pipelines with GitHub Actions, each step presented new challenges
+that expanded my skills and knowledge.
 
-Along the way, I developed skills in cloud architecture, scripting, security
-best practices, and testing—building a strong foundation for my goal of
-becoming a DevOps Engineer.
+Throughout this journey, I strengthened my technical expertise in cloud
+engineering, DevOps practices, scripting, and testing—laying a solid foundation
+for my long-term goal of becoming a DevOps Engineer. I also refined my ability
+to quickly learn, adapt to new challenges, and manage multiple responsibilities
+effectively.
 
 If you're working on the Cloud Resume Challenge or exploring similar projects,
 I hope this write-up helps. Feel free to explore the repo, fork it, or reach

@@ -1,6 +1,6 @@
 ---
-title: "Welcome to Blowfish!"
-description: "This is a demo of adding content to the homepage."
+title: "Welcome to my website!"
+description: "I'm really happy you stopped by."
 ---
 
 `Welcome to my website! I'm really happy you stopped by.`
